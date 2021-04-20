@@ -1,0 +1,10 @@
+target
+work
+.idea
+*.iws
+*.iml
+*.ipr
+.settings
+.project
+.classpath
+durable_task_monitor_*
