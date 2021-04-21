@@ -33,7 +33,7 @@
         <relativePath />
     </parent>
     <groupId>io.jenkins.plugins</groupId>
-    <artifactId>durable-task-lib</artifactId>
+    <artifactId>lib-durable-task</artifactId>
     <packaging>jar</packaging>
     <version>${revision}${changelist}</version>
     <name>Durable Task Library</name>

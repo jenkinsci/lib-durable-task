@@ -1,4 +1,4 @@
-# durable-task-library
+# lib-durable-task
 
 This repository provides the binaries that launch the scripts from the [`durable-task-plugin`](https://github.com/jenkinsci/durable-task-plugin).
 
