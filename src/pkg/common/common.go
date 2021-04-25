@@ -69,7 +69,14 @@ func ValidateFlags(defined map[string]string, required []string) bool {
 
 // Rebuilds the command line arguments, excluding the daemon flag
 func RebuildArgs(defined map[string]string, daemonFlag string) []string {
-	rebuiltArgs := make([]string, len(defined)-1)
+	rebuiltLength := len(defined)
+	_, ok := defined[daemonFlag]
+	if ok {
+		rebuiltLength--
+	} else {
+		fmt.Printf("Warning daemon flag (-%v) not found\n", daemonFlag)
+	}
+	rebuiltArgs := make([]string, rebuiltLength)
 	argIndex := 0
 	for argKey, argValue := range defined {
 		if argKey != daemonFlag {
