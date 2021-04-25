@@ -7,4 +7,6 @@ work
 .settings
 .project
 .classpath
-durable_task_monitor_*
+.vscode
+pkg/mod/
+pkg/sumdb/
