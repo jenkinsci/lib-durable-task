@@ -10,3 +10,5 @@ work
 .vscode
 pkg/mod/
 pkg/sumdb/
+test-results/
+bin/
