@@ -17,14 +17,14 @@ mkdir -p "${TEST}"
 cd ${BASEDIR}/pkg/common
 go mod tidy
 go get -v gotest.tools/gotestsum@v0.4.2
-if ! gotestsum --format standard-verbose --junitfile ${TEST}/common-unit-test.xml
+if ! gotestsum --format standard-verbose --junitfile ${TEST}/common-unit-tests.xml
 then
   echo "common" >> ${FAILED}
 fi
 cd ${BASEDIR}/cmd/bash
 go mod tidy
 go get -v gotest.tools/gotestsum@v0.4.2
-if ! gotestsum --format standard-verbose --junitfile ${TEST}/bash-unit-test.xml
+if ! gotestsum --format standard-verbose --junitfile ${TEST}/bash-unit-tests.xml
 then
   echo "bash" >> ${FAILED}
 fi
@@ -32,7 +32,7 @@ fi
 #cd ${SRC}/cmd/windows
 #go mod tidy
 #go get -v gotest.tools/gotestsum@v0.4.2
-#gotestsum --format standard-verbose --junitfile ${TEST}/windows-unit-test.xml
+#gotestsum --format standard-verbose --junitfile ${TEST}/windows-unit-tests.xml
 
 # build the binaries
 rm -rf ${BIN}

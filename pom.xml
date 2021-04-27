@@ -88,7 +88,7 @@
                             <run>
                                 <volumes>
                                     <bind>
-                                        <volume>${project.basedir}/target/src:/durabletask</volume>
+                                        <volume>${project.build.directory}/src:/durabletask</volume>
                                     </bind>
                                 </volumes>
                                 <log>
@@ -136,10 +136,10 @@
                         <id>copy-source</id>
                         <phase>generate-sources</phase>
                         <goals>
-                            <goal>resources</goal>
+                            <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.basedir}/target/</outputDirectory>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
@@ -158,11 +158,11 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.basedir}/target/build/</outputDirectory>
+                            <outputDirectory>${project.build.directory}/build/</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
-                                    <directory>${project.basedir}/target/src</directory>
+                                    <directory>${project.build.directory}/src</directory>
                                     <includes>
                                         <include>test-results/*</include>
                                     </includes>
@@ -172,10 +172,34 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.0.0-M3</version>
+                <executions>
+                    <execution>
+                        <id>enforce-no-test-failures</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireFilesDontExist>
+                                    <files>
+                                        <file>${project.build.directory}/build/test-results/failed</file>
+                                    </files>
+                                </requireFilesDontExist>
+                            </rules>
+                            <fail>true</fail>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
         <resources>
             <resource>
-                <directory>${project.basedir}/target/src/bin</directory>
+                <directory>${project.build.directory}/src/bin</directory>
                 <includes>
                     <include>durable_task_monitor_*_darwin_*</include>
                     <include>durable_task_monitor_*_unix_*</include>
