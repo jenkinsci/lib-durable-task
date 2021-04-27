@@ -88,7 +88,7 @@
                             <run>
                                 <volumes>
                                     <bind>
-                                        <volume>${project.basedir}/src:/durabletask</volume>
+                                        <volume>${project.basedir}/target/src:/durabletask</volume>
                                     </bind>
                                 </volumes>
                                 <log>
@@ -105,7 +105,7 @@
                 <executions>
                     <execution>
                         <id>build-docker-image</id>
-                        <phase>initialize</phase>
+                        <phase>process-sources</phase>
                         <goals>
                             <goal>build</goal>
                         </goals>
@@ -133,7 +133,26 @@
                 <version>3.2.0</version>
                 <executions>
                     <execution>
-                        <id>copy-resources</id>
+                        <id>copy-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.basedir}/target/</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}</directory>
+                                    <includes>
+                                        <include>src/**</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-test-results</id>
                         <phase>verify</phase>
                         <goals>
                             <goal>copy-resources</goal>
@@ -143,7 +162,7 @@
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
-                                    <directory>src</directory>
+                                    <directory>${project.basedir}/target/src</directory>
                                     <includes>
                                         <include>test-results/*</include>
                                     </includes>
@@ -156,7 +175,7 @@
         </plugins>
         <resources>
             <resource>
-                <directory>src/bin</directory>
+                <directory>${project.basedir}/target/src/bin</directory>
                 <includes>
                     <include>durable_task_monitor_*_darwin_*</include>
                     <include>durable_task_monitor_*_unix_*</include>
