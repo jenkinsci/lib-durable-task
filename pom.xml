@@ -185,13 +185,13 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/build/</outputDirectory>
+                            <outputDirectory>${project.build.directory}/surefire-reports/</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
-                                    <directory>${project.build.directory}/src</directory>
+                                    <directory>${project.build.directory}/src/test-results</directory>
                                     <includes>
-                                        <include>test-results/*</include>
+                                        <include>*</include>
                                     </includes>
                                 </resource>
                             </resources>
