@@ -28,11 +28,6 @@ if ! gotestsum --format standard-verbose --junitfile ${TEST}/bash-unit-tests.xml
 then
   echo "bash" >> ${FAILED}
 fi
-#TODO: Windows test
-#cd ${SRC}/cmd/windows
-#go mod tidy
-#go get -v gotest.tools/gotestsum@v0.4.2
-#gotestsum --format standard-verbose --junitfile ${TEST}/windows-unit-tests.xml
 
 # build the binaries
 rm -rf ${BIN}
@@ -42,9 +37,5 @@ env CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -a -o ${BIN}/${NAME}_${VER}_
 env CGO_ENABLED=0 GOOS=darwin GOARCH=386 go build -a -o ${BIN}/${NAME}_${VER}_darwin_32
 env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o ${BIN}/${NAME}_${VER}_unix_64
 env CGO_ENABLED=0 GOOS=linux GOARCH=386 go build -a -o ${BIN}/${NAME}_${VER}_unix_32
-#TODO: Windows build
-#cd ${BASEDIR}/cmd/windows
-#env CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -a -o ${BIN}/${NAME}_${VER}_win_64
-#env CGO_ENABLED=0 GOOS=windows GOARCH=386 go build -a -o ${BIN}/${NAME}_${VER}_win_32
 
 echo "binary generation complete. If you are still seeing this message, press Ctrl-C to exit."

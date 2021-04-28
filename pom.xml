@@ -72,6 +72,33 @@
         <tag>${scmTag}</tag>
     </scm>
 
+    <profiles>
+        <profile>
+            <id>linux</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <docker.buildArg.platform_tag>buster</docker.buildArg.platform_tag>
+                <image.platform>buster</image.platform>
+                <entrypoint.script>test-and-compile-binaries.sh</entrypoint.script>
+            </properties>
+        </profile>
+        <profile>
+            <id>windows</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <properties>
+                <docker.buildArg.platform_tag>nanoserver</docker.buildArg.platform_tag>
+                <image.platform>nanoserver</image.platform>
+                <entrypoint.script>test-and-compile-binaries.bat</entrypoint.script>
+            </properties>
+        </profile>
+    </profiles>
+
     <dependencies>
     </dependencies>
     <build>
