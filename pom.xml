@@ -81,7 +81,7 @@
             <properties>
                 <docker.buildArg.platform_tag>buster</docker.buildArg.platform_tag>
                 <image.platform>buster</image.platform>
-                <entrypoint.script>test-and-compile-binaries.sh</entrypoint.script>
+                <entrypoint.script>/bin/sh test-and-compile-binaries.sh</entrypoint.script>
             </properties>
         </profile>
         <profile>
