@@ -1,4 +1,3 @@
-rem TODO
 setlocal
 
 rem maven plugin version
@@ -17,5 +16,19 @@ echo %BIN%
 echo %TEST%
 echo %FAILED%
 echo %NAME%
+
+rem gotestsum will generate junit test reports. v0.4.2 is the latest compatible with golang 1.14
+del %TEST%
+mkdir %TEST%
+cd %BASEDIR5\pkg\common
+go mod tidy
+go get -v gotest.tools/gotestsum@v0.4.2
+gotestsum --format standard-verbose --junitfile %TEST%\common-unit-tests.xml
+if %ERROR_LEVEL%  == 0 echo command unit tests success
+cd %BASEDIR%\cmd\bash
+go mod tidy
+go get -v gotest.tools/gotestsum@v0.4.2
+gotestsum --format standard-verbose --junitfile %TEST%\bash-unit-tests.xml
+if %ERROR_LEVEL%  == 0 echo bash unit tests success
 
 endlocal
