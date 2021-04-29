@@ -72,65 +72,130 @@
         <tag>${scmTag}</tag>
     </scm>
 
-    <dependencies>
-    </dependencies>
+    <profiles>
+        <profile>
+            <id>linux</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <docker.script>generate-binaries.sh</docker.script>
+<!--                <docker.image.platform_tag>buster</docker.image.platform_tag>-->
+<!--                <docker.entrypoint.script>/bin/sh test-and-compile-binaries.sh</docker.entrypoint.script>-->
+            </properties>
+        </profile>
+        <profile>
+            <id>windows</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <properties>
+                <docker.script>generate-binaries.bat</docker.script>
+<!--                <docker.image.platform_tag>nanoserver</docker.image.platform_tag>-->
+<!--                <docker.entrypoint.script>cmd.exe test-and-compile-binaries.bat</docker.entrypoint.script>-->
+            </properties>
+        </profile>
+    </profiles>
+
     <build>
         <plugins>
             <plugin>
-                <groupId>io.fabric8</groupId>
-                <artifactId>docker-maven-plugin</artifactId>
-                <version>0.35.0</version>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.6.0</version>
                 <configuration>
-                    <images>
-                        <image>
-                            <alias>durable-task-binary-generator</alias>
-                            <name>jenkins-ci.durable-task/binary-generator:${project.version}</name>
-                            <run>
-                                <volumes>
-                                    <bind>
-                                        <volume>${project.basedir}/src:/durabletask</volume>
-                                    </bind>
-                                </volumes>
-                                <log>
-                                    <date>default</date>
-                                </log>
-                                <wait>
-                                    <log>binary generation complete.</log>
-                                    <time>300000</time>
-                                </wait>
-                            </run>
-                        </image>
-                    </images>
+                    <executable>${project.build.directory}/src/${docker.script}</executable>
+                    <workingDirectory>${project.build.directory}/src</workingDirectory>
+                    <arguments>
+                        <argument>${revision}</argument>
+                        <argument>${project.build.directory}/src</argument>
+                    </arguments>
                 </configuration>
                 <executions>
                     <execution>
-                        <id>build-docker-image</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>build</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>compile-in-docker</id>
+                        <id>docker-generate-binaries</id>
                         <phase>compile</phase>
                         <goals>
-                            <goal>start</goal>
+                            <goal>exec</goal>
                         </goals>
                     </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
                     <execution>
-                        <id>docker-cleanup</id>
-                        <phase>package</phase>
+                        <id>copy-source</id>
+                        <phase>generate-sources</phase>
                         <goals>
-                            <goal>stop</goal>
-                            <goal>remove</goal>
+                            <goal>copy-resources</goal>
                         </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}</directory>
+                                    <includes>
+                                        <include>src/**</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-test-results</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/surefire-reports/</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.directory}/src/test-results</directory>
+                                    <includes>
+                                        <include>*</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.0.0-M3</version>
+                <executions>
+                    <execution>
+                        <id>enforce-no-test-failures</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireFilesDontExist>
+                                    <files>
+                                        <file>${project.build.directory}/surefire-reports/failed</file>
+                                    </files>
+                                </requireFilesDontExist>
+                            </rules>
+                            <fail>true</fail>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
         <resources>
             <resource>
-                <directory>src</directory>
+                <directory>${project.build.directory}/src/bin</directory>
                 <includes>
                     <include>durable_task_monitor_*_darwin_*</include>
                     <include>durable_task_monitor_*_unix_*</include>

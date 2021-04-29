@@ -1,0 +1,10 @@
+# NOTE: golang > 1.14 drops darwin 32-bit support
+ARG PLATFORM
+FROM golang:1.14-$PLATFORM
+
+ARG ENTRY_SCRIPT
+ARG PLUGIN_VER
+ENV SCRIPT=${ENTRY_SCRIPT}
+ENV VER=${PLUGIN_VER}
+WORKDIR /durabletask
+ENTRYPOINT /durabletask/$SCRIPT $VER
