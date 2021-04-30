@@ -79,9 +79,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <docker.script>generate-binaries.sh</docker.script>
-<!--                <docker.image.platform_tag>buster</docker.image.platform_tag>-->
-<!--                <docker.entrypoint.script>/bin/sh test-and-compile-binaries.sh</docker.entrypoint.script>-->
+                <docker.creation.script>generate-binaries.sh</docker.creation.script>
             </properties>
         </profile>
         <profile>
@@ -92,9 +90,7 @@
                 </os>
             </activation>
             <properties>
-                <docker.script>generate-binaries.bat</docker.script>
-<!--                <docker.image.platform_tag>nanoserver</docker.image.platform_tag>-->
-<!--                <docker.entrypoint.script>cmd.exe test-and-compile-binaries.bat</docker.entrypoint.script>-->
+                <docker.creation.script>generate-binaries.bat</docker.creation.script>
             </properties>
         </profile>
     </profiles>
@@ -106,7 +102,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.6.0</version>
                 <configuration>
-                    <executable>${project.build.directory}/src/${docker.script}</executable>
+                    <executable>${project.build.directory}/src/${docker.creation.script}</executable>
                     <workingDirectory>${project.build.directory}/src</workingDirectory>
                     <arguments>
                         <argument>${revision}</argument>

@@ -1,5 +1,5 @@
 setlocal
-echo off
+@echo off
 
 rem maven plugin version
 set VER=%1
@@ -37,7 +37,7 @@ set CGO_ENABLED=0& set GOOS=darwin& set GOARCH=amd64& go build -a -o %BIN%/%NAME
 rem TODO build windows
 dir %BIN%
 
-echo "binary generation complete. If you are still seeing this message, press Ctrl-C to exit."
+echo "binary generation complete."
 
-echo on
+@echo on
 endlocal

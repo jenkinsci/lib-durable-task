@@ -5,12 +5,6 @@ VER=$1
 # path to the golang source
 SRC=$2
 IMG_NAME="durable-task-binary-generator"
-BIN_NAME="durable_task_monitor"
-docker build --build-arg PLATFORM="buster" \
-             --build-arg ENTRY_SCRIPT="test-and-compile.sh" \
-             --build-arg PLUGIN_VER=${VER} \
-      -t ${IMG_NAME}:${VER} .
-docker run -i --rm \
-    --mount type=bind,src=${SRC},dst=/durabletask \
-    ${IMG_NAME}:${VER}
+docker build --build-arg PLATFORM="buster" -t ${IMG_NAME}:${VER} .
+docker run -i --rm --mount type=bind,src=${SRC},dst=/durabletask ${IMG_NAME}:${VER} /durabletask/test-and-compile.sh ${VER}
 docker rmi ${IMG_NAME}:${VER}

@@ -39,4 +39,4 @@ env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o ${BIN}/${NAME}_${VER}_u
 env CGO_ENABLED=0 GOOS=linux GOARCH=386 go build -a -o ${BIN}/${NAME}_${VER}_unix_32
 # TODO build windows
 
-echo "binary generation complete. If you are still seeing this message, press Ctrl-C to exit."
+echo "binary generation complete."
