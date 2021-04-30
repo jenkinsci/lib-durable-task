@@ -10,17 +10,21 @@ set TEST=%BASEDIR%\test-results
 rem failure file
 set FAILED=%TEST%\failed
 set NAME=durable_task_monitor
+rem resolves https://golang.org/issue/36568 for windows machines
+set GODEBUG=modcacheunzipinplace=1
 
 rem gotestsum will generate junit test reports. v0.4.2 is the latest compatible with golang 1.14
 del /s /q %TEST%
 mkdir %TEST%
 cd %BASEDIR%\pkg\common
 go mod tidy
+go get -v gotest.tools/gotestsum@v0.4.2
 gotestsum --format standard-verbose --junitfile %TEST%\common-unit-tests.xml
 if NOT %ERRORLEVEL% == 0 echo command>>%FAILED%
 rem TODO test windows
 rem cd %BASEDIR%\cmd\windows
 rem go mod tidy
+rem go get -v gotest.tools/gotestsum@v0.4.2
 rem gotestsum --format standard-verbose --junitfile %TEST%\bash-unit-tests.xml
 rem if NOT %ERRORLEVEL% == 0 echo windows>>%FAILED%
 
