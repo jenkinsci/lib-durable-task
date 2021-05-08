@@ -1,6 +1,6 @@
 ARG BASE_DIR=/durabletask
-ARG NAME=dtmon
-ARG VERSION=0.1
+ARG NAME=durable_task_monitor
+ARG VERSION=0.0
 
 FROM golang:1.16.4-buster AS builder
 ARG BASE_DIR

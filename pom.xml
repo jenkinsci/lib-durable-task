@@ -34,11 +34,10 @@
     </parent>
     <groupId>io.jenkins.plugins</groupId>
     <artifactId>lib-durable-task</artifactId>
-    <packaging>jar</packaging>
     <version>${revision}${changelist}</version>
     <name>Durable Task Library</name>
     <description>Generates and packages the binaries used by Durable Task Plugin</description>
-    <url>http://maven.apache.org</url>
+    <url>https://github.com/jenkinsci/lib-durable-task</url>
     <licenses>
         <license>
             <name>MIT License</name>

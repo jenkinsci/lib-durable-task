@@ -1,6 +1,6 @@
 ARG BASE_DIR=/durabletask
-ARG NAME=dtmon
-ARG VERSION=0.1
+ARG NAME=durable_task_monitor
+ARG VERSION=0.0
 
 FROM golang:1.16.4-nanoserver AS builder
 ARG BASE_DIR
@@ -18,22 +18,19 @@ RUN set CGO_ENABLED=0& set GOOS=darwin& set GOARCH=amd64& go build -a -o %NAME%_
 RUN set CGO_ENABLED=0& set GOOS=darwin& set GOARCH=arm64& go build -a -o %NAME%_%VERSION%_darwin_arm_64
 RUN set CGO_ENABLED=0& set GOOS=linux& set GOARCH=amd64& go build -a -o %NAME%_%VERSION%_linux_64
 RUN set CGO_ENABLED=0& set GOOS=linux& set GOARCH=386& go build -a -o %NAME%_%VERSION%_linux_32
-# TODO WINDOWS
+# TODO: WINDOWS
 # WORKDIR $BASE_DIR/cmd/windows
 # RUN go mod tidy
 # RUN go test -v
 
-FROM mcr.microsoft.com/windows/nanoserver:20H2 as export-stage
-ARG BASE_DIR
-ARG NAME
-ARG VERSION
-WORKDIR $BASE_DIR
-COPY --from=builder $BASE_DIR/cmd/bash/${NAME}_${VERSION}_darwin_amd_64 $BASE_DIR 
-COPY --from=builder $BASE_DIR/cmd/bash/${NAME}_${VERSION}_darwin_arm_64 $BASE_DIR 
-COPY --from=builder $BASE_DIR/cmd/bash/${NAME}_${VERSION}_linux_64 $BASE_DIR 
-COPY --from=builder $BASE_DIR/cmd/bash/${NAME}_${VERSION}_linux_32 $BASE_DIR 
-# docker build --output requires BuildKit, not available for windows containers
-# docker build -f Dockerfile.windows -t dtgen:test .
-# docker create -ti --name dummy dtgen:test cmd
-# docker cp dummy:/durabletask/dtmon_0.1_darwin_amd_64  .
-# docker rm -f dummy
+# TODO: uncomment once docker build --output (i.e. BuildKit) is available for windows containers
+# see: https://github.com/microsoft/Windows-Containers/issues/34
+# FROM mcr.microsoft.com/windows/nanoserver:20H2 as export-stage
+# ARG BASE_DIR
+# ARG NAME
+# ARG VERSION
+# WORKDIR $BASE_DIR
+# COPY --from=builder $BASE_DIR/cmd/bash/${NAME}_${VERSION}_darwin_amd_64 $BASE_DIR
+# COPY --from=builder $BASE_DIR/cmd/bash/${NAME}_${VERSION}_darwin_arm_64 $BASE_DIR
+# COPY --from=builder $BASE_DIR/cmd/bash/${NAME}_${VERSION}_linux_64 $BASE_DIR
+# COPY --from=builder $BASE_DIR/cmd/bash/${NAME}_${VERSION}_linux_32 $BASE_DIR
