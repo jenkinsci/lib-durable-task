@@ -2,8 +2,7 @@ ARG BASE_DIR=/durabletask
 ARG NAME=dtmon
 ARG VERSION=0.1
 
-# NOTE: golang > 1.14 drops darwin 32-bit support
-FROM golang:1.14.15-buster AS builder
+FROM golang:1.16.4-buster AS builder
 ARG BASE_DIR
 ARG NAME
 ARG VERSION
@@ -15,10 +14,14 @@ RUN go test -v
 WORKDIR $BASE_DIR/cmd/bash
 RUN go mod tidy
 RUN go test -v
-RUN CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -a -o ${NAME}_${VERSION}_darwin_64
-RUN CGO_ENABLED=0 GOOS=darwin GOARCH=386 go build -a -o ${NAME}_${VERSION}_darwin_32
+RUN CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -a -o ${NAME}_${VERSION}_darwin_amd_64
+RUN CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -a -o ${NAME}_${VERSION}_darwin_arm_64
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o ${NAME}_${VERSION}_linux_64
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=386 go build -a -o ${NAME}_${VERSION}_linux_32
+# TODO WINDOWS
+# WORKDIR $BASE_DIR/cmd/windows
+# RUN go mod tidy
+# RUN go test -v
 
 FROM scratch AS export-stage
 ARG BASE_DIR
