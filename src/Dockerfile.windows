@@ -9,10 +9,10 @@ ARG VERSION
 ADD cmd $BASE_DIR/cmd
 ADD pkg $BASE_DIR/pkg
 WORKDIR $BASE_DIR/pkg/common
-RUN go mod tidy
+RUN go mod tidy -modcacherw
 RUN go test -v
 WORKDIR $BASE_DIR/cmd/bash
-RUN go mod tidy
+RUN go mod tidy -modcacherw
 # can't test bash on windows
 RUN set CGO_ENABLED=0& set GOOS=darwin& set GOARCH=amd64& go build -a -o %NAME%_%VERSION%_darwin_amd_64
 RUN set CGO_ENABLED=0& set GOOS=darwin& set GOARCH=arm64& go build -a -o %NAME%_%VERSION%_darwin_arm_64
