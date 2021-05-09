@@ -74,9 +74,6 @@
     <profiles>
         <profile>
             <id>linux</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
             <properties>
                 <binary.generation.script>docker-generate-binaries.sh</binary.generation.script>
             </properties>
