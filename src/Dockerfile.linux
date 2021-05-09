@@ -27,4 +27,4 @@ FROM scratch AS export-stage
 ARG BASE_DIR
 ARG NAME
 ARG VERSION
-COPY --from=builder $BASE_DIR/cmd/bash/${NAME}_${VERSION}_* .
+COPY --from=builder $BASE_DIR/cmd/bash/${NAME}_${VERSION}_* /

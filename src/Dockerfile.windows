@@ -8,6 +8,7 @@ ARG NAME
 ARG VERSION
 ADD cmd $BASE_DIR/cmd
 ADD pkg $BASE_DIR/pkg
+ENV GODEBUG=modcacheunzipinplace=1
 WORKDIR $BASE_DIR/pkg/common
 RUN go mod tidy
 RUN go test -v
