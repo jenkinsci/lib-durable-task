@@ -11,6 +11,9 @@ ADD pkg $BASE_DIR/pkg
 WORKDIR $BASE_DIR/pkg/common
 RUN go test -v
 WORKDIR $BASE_DIR/cmd/bash
+# go mod tidy fails in windows CI due to permissions of module cache. Each dependency needs to be fetched with -modcacherw flag
+# see golang.org/issue/31481
+# RUN go mod tidy
 RUN go get -modcacherw jenkinsci.org/plugins/durabletask/common
 RUN go get -modcacherw golang.org/x/sys
 # can't test bash on windows
