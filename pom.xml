@@ -78,7 +78,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <docker.creation.script>generate-binaries.sh</docker.creation.script>
+                <binary.generation.script>docker-generate-binaries.sh</binary.generation.script>
             </properties>
         </profile>
         <profile>
@@ -89,7 +89,7 @@
                 </os>
             </activation>
             <properties>
-                <docker.creation.script>generate-binaries.bat</docker.creation.script>
+                <binary.generation.script>docker-generate-binaries.bat</binary.generation.script>
             </properties>
         </profile>
     </profiles>
@@ -101,11 +101,11 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.6.0</version>
                 <configuration>
-                    <executable>${project.build.directory}/src/${docker.creation.script}</executable>
-                    <workingDirectory>${project.build.directory}/src</workingDirectory>
+                    <executable>${project.basedir}/src/${binary.generation.script}</executable>
+                    <workingDirectory>${project.basedir}/src</workingDirectory>
                     <arguments>
                         <argument>${revision}</argument>
-                        <argument>${project.build.directory}/src</argument>
+                        <argument>${project.build.directory}/classes</argument>
                     </arguments>
                 </configuration>
                 <executions>
@@ -118,85 +118,7 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.2.0</version>
-                <executions>
-                    <execution>
-                        <id>copy-source</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}</outputDirectory>
-                            <overwrite>true</overwrite>
-                            <resources>
-                                <resource>
-                                    <directory>${project.basedir}</directory>
-                                    <includes>
-                                        <include>src/**</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>copy-test-results</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/surefire-reports/</outputDirectory>
-                            <overwrite>true</overwrite>
-                            <resources>
-                                <resource>
-                                    <directory>${project.build.directory}/src/test-results</directory>
-                                    <includes>
-                                        <include>*</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.0.0-M3</version>
-                <executions>
-                    <execution>
-                        <id>enforce-no-test-failures</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>enforce</goal>
-                        </goals>
-                        <configuration>
-                            <rules>
-                                <requireFilesDontExist>
-                                    <files>
-                                        <file>${project.build.directory}/surefire-reports/failed</file>
-                                    </files>
-                                </requireFilesDontExist>
-                            </rules>
-                            <fail>true</fail>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
-        <resources>
-            <resource>
-                <directory>${project.build.directory}/src/bin</directory>
-                <includes>
-                    <include>durable_task_monitor_*_darwin_*</include>
-                    <include>durable_task_monitor_*_unix_*</include>
-                </includes>
-            </resource>
-        </resources>
     </build>
 
 </project>
