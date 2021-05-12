@@ -6,8 +6,8 @@ FROM golang:1.16.4-nanoserver AS builder
 ARG BASE_DIR
 ARG NAME
 ARG VERSION
-ADD cmd $BASE_DIR/cmd
-ADD pkg $BASE_DIR/pkg
+COPY cmd $BASE_DIR/cmd
+COPY pkg $BASE_DIR/pkg
 WORKDIR $BASE_DIR/pkg/common
 RUN go test -v
 WORKDIR $BASE_DIR/cmd/bash
