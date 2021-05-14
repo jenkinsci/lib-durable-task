@@ -27,18 +27,17 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.jenkins-ci.plugins</groupId>
-        <artifactId>plugin</artifactId>
-        <version>4.18</version>
+        <groupId>org.jenkins-ci</groupId>
+        <artifactId>jenkins</artifactId>
+        <version>1.63</version>
         <relativePath />
     </parent>
     <groupId>io.jenkins.plugins</groupId>
     <artifactId>lib-durable-task</artifactId>
-    <packaging>jar</packaging>
     <version>${revision}${changelist}</version>
     <name>Durable Task Library</name>
     <description>Generates and packages the binaries used by Durable Task Plugin</description>
-    <url>http://maven.apache.org</url>
+    <url>https://github.com/jenkinsci/lib-durable-task</url>
     <licenses>
         <license>
             <name>MIT License</name>
@@ -72,71 +71,54 @@
         <tag>${scmTag}</tag>
     </scm>
 
-    <dependencies>
-    </dependencies>
+    <profiles>
+        <profile>
+            <id>bash</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <binary.generation.script>docker-generate-binaries.sh</binary.generation.script>
+            </properties>
+        </profile>
+        <profile>
+            <id>windows</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <properties>
+                <binary.generation.script>docker-generate-binaries.bat</binary.generation.script>
+            </properties>
+        </profile>
+    </profiles>
+
     <build>
         <plugins>
             <plugin>
-                <groupId>io.fabric8</groupId>
-                <artifactId>docker-maven-plugin</artifactId>
-                <version>0.35.0</version>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.6.0</version>
                 <configuration>
-                    <images>
-                        <image>
-                            <alias>durable-task-binary-generator</alias>
-                            <name>jenkins-ci.durable-task/binary-generator:${project.version}</name>
-                            <run>
-                                <volumes>
-                                    <bind>
-                                        <volume>${project.basedir}/src:/durabletask</volume>
-                                    </bind>
-                                </volumes>
-                                <log>
-                                    <date>default</date>
-                                </log>
-                                <wait>
-                                    <log>binary generation complete.</log>
-                                    <time>300000</time>
-                                </wait>
-                            </run>
-                        </image>
-                    </images>
+                    <executable>${project.basedir}/src/${binary.generation.script}</executable>
+                    <workingDirectory>${project.basedir}/src</workingDirectory>
+                    <arguments>
+                        <argument>${revision}</argument>
+                        <argument>${project.build.directory}/classes</argument>
+                    </arguments>
                 </configuration>
                 <executions>
                     <execution>
-                        <id>build-docker-image</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>build</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>compile-in-docker</id>
+                        <id>docker-generate-binaries</id>
                         <phase>compile</phase>
                         <goals>
-                            <goal>start</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>docker-cleanup</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>stop</goal>
-                            <goal>remove</goal>
+                            <goal>exec</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
-        <resources>
-            <resource>
-                <directory>src</directory>
-                <includes>
-                    <include>durable_task_monitor_*_darwin_*</include>
-                    <include>durable_task_monitor_*_unix_*</include>
-                </includes>
-            </resource>
-        </resources>
     </build>
 
 </project>
