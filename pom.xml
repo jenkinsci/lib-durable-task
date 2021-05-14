@@ -33,7 +33,7 @@
     </parent>
     <groupId>io.jenkins.plugins</groupId>
     <artifactId>lib-durable-task</artifactId>
-    <version>1.0</version>
+    <version>${revision}${changelist}</version>
     <name>Durable Task Library</name>
     <description>Generates and packages the binaries used by Durable Task Plugin</description>
     <url>https://github.com/jenkinsci/lib-durable-task</url>
@@ -45,7 +45,7 @@
     </licenses>
 
     <properties>
-        <revision>1.0</revision>
+        <revision>1.1</revision>
         <changelist>-SNAPSHOT</changelist>
         <java.level>8</java.level>
     </properties>
@@ -67,7 +67,7 @@
         <connection>scm:git:git://github.com/jenkinsci/lib-durable-task.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/jenkinsci/lib-durable-task.git</developerConnection>
         <url>https://github.com/jenkinsci/lib-durable-task</url>
-        <tag>lib-durable-task-1.0</tag>
+        <tag>${scmTag}</tag>
     </scm>
 
     <profiles>
