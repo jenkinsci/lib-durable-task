@@ -23,8 +23,7 @@
   ~ THE SOFTWARE.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.jenkins-ci</groupId>
@@ -34,7 +33,7 @@
     </parent>
     <groupId>io.jenkins.plugins</groupId>
     <artifactId>lib-durable-task</artifactId>
-    <version>${revision}${changelist}</version>
+    <version>1.0</version>
     <name>Durable Task Library</name>
     <description>Generates and packages the binaries used by Durable Task Plugin</description>
     <url>https://github.com/jenkinsci/lib-durable-task</url>
@@ -68,7 +67,7 @@
         <connection>scm:git:git://github.com/jenkinsci/lib-durable-task.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/jenkinsci/lib-durable-task.git</developerConnection>
         <url>https://github.com/jenkinsci/lib-durable-task</url>
-        <tag>${scmTag}</tag>
+        <tag>lib-durable-task-1.0</tag>
     </scm>
 
     <profiles>
