@@ -81,7 +81,7 @@ func TestLauncher(t *testing.T) {
 	wg.Wait()
 
 	launchOutput := launchBuffer.String()
-	launchLoggerExp := regexp.MustCompile(`^args 0: sh\nargs 1: -xe\nargs 2: .*\/src\/cmd\/bash\/test-script.sh\nlaunched \d*\nscript exit code: 0`)
+	launchLoggerExp := regexp.MustCompile(`^args 0: sh\nargs 1: -xe\nargs 2: .*\/cmd\/bash\/test-script.sh\nlaunched \d*\nscript exit code: 0`)
 	if !launchLoggerExp.MatchString(launchOutput) {
 		t.Errorf("launch output incorrect:\n%v", launchOutput)
 	}
