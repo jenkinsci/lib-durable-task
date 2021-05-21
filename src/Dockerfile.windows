@@ -15,7 +15,7 @@ WORKDIR $BASE_DIR/cmd/bash
 # see golang.org/issue/31481
 # RUN go mod tidy
 RUN go get -modcacherw jenkinsci.org/plugins/durabletask/common
-RUN go get -modcacherw golang.org/x/sys
+RUN go get -modcacherw golang.org/x/sys@v0.0.0-20210514084401-e8d321eab015
 # can't test bash on windows
 RUN set CGO_ENABLED=0& set GOOS=darwin& set GOARCH=amd64& go build -a -o %NAME%_%VERSION%_darwin_amd_64
 RUN set CGO_ENABLED=0& set GOOS=darwin& set GOARCH=arm64& go build -a -o %NAME%_%VERSION%_darwin_arm_64
