@@ -117,6 +117,32 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.0.0-M3</version>
+                <executions>
+                    <execution>
+                        <id>enforce-binaries-generated</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireFilesExist>
+                                    <files>
+                                        <file>${project.build.directory}/classes/durable_task_monitor_${revision}_darwin_amd_64</file>
+                                        <file>${project.build.directory}/classes/durable_task_monitor_${revision}_darwin_arm_64</file>
+                                        <file>${project.build.directory}/classes/durable_task_monitor_${revision}_linux_64</file>
+                                        <file>${project.build.directory}/classes/durable_task_monitor_${revision}_linux_32</file>
+                                    </files>
+                                </requireFilesExist>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
