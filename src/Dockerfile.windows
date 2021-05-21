@@ -6,7 +6,6 @@ FROM golang:1.16.4-nanoserver AS builder
 ARG BASE_DIR
 ARG NAME
 ARG VERSION
-ENV GOFLAGS=-modcacherw
 COPY cmd $BASE_DIR/cmd
 COPY pkg $BASE_DIR/pkg
 WORKDIR $BASE_DIR/pkg/common
@@ -14,9 +13,9 @@ RUN go test -v
 WORKDIR $BASE_DIR/cmd/bash
 # go mod tidy fails in windows CI due to permissions of module cache. Each dependency needs to be fetched with -modcacherw flag
 # see golang.org/issue/31481
-RUN go mod tidy
-# RUN go get -modcacherw jenkinsci.org/plugins/durabletask/common
-# RUN go get -modcacherw golang.org/x/sys
+# RUN go mod tidy
+RUN go get -modcacherw jenkinsci.org/plugins/durabletask/common
+RUN go get -modcacherw golang.org/x/sys@v0.0.0-20210507161434-a76c4d0a0096
 # can't test bash on windows
 RUN set CGO_ENABLED=0& set GOOS=darwin& set GOARCH=amd64& go build -a -o %NAME%_%VERSION%_darwin_amd_64
 RUN set CGO_ENABLED=0& set GOOS=darwin& set GOARCH=arm64& go build -a -o %NAME%_%VERSION%_darwin_arm_64
