@@ -1,11 +1,9 @@
 ARG BASE_DIR=/durabletask
 ARG NAME=durable_task_monitor
-ARG VERSION=0.0
 
 FROM golang:1.16.4-nanoserver AS builder
 ARG BASE_DIR
 ARG NAME
-ARG VERSION
 COPY cmd $BASE_DIR/cmd
 COPY pkg $BASE_DIR/pkg
 WORKDIR $BASE_DIR/pkg/common
@@ -17,10 +15,10 @@ WORKDIR $BASE_DIR/cmd/bash
 RUN go get -modcacherw jenkinsci.org/plugins/durabletask/common
 RUN go get -modcacherw golang.org/x/sys@v0.0.0-20210514084401-e8d321eab015
 # can't test bash on windows
-RUN set CGO_ENABLED=0& set GOOS=darwin& set GOARCH=amd64& go build -a -o %NAME%_%VERSION%_darwin_amd_64
-RUN set CGO_ENABLED=0& set GOOS=darwin& set GOARCH=arm64& go build -a -o %NAME%_%VERSION%_darwin_arm_64
-RUN set CGO_ENABLED=0& set GOOS=linux& set GOARCH=amd64& go build -a -o %NAME%_%VERSION%_linux_64
-RUN set CGO_ENABLED=0& set GOOS=linux& set GOARCH=386& go build -a -o %NAME%_%VERSION%_linux_32
+RUN set CGO_ENABLED=0& set GOOS=darwin& set GOARCH=amd64& go build -a -o %NAME%_darwin_amd64
+RUN set CGO_ENABLED=0& set GOOS=darwin& set GOARCH=arm64& go build -a -o %NAME%_darwin_arm64
+RUN set CGO_ENABLED=0& set GOOS=linux& set GOARCH=amd64& go build -a -o %NAME%_linux_64
+RUN set CGO_ENABLED=0& set GOOS=linux& set GOARCH=386& go build -a -o %NAME%_linux_32
 # TODO: WINDOWS
 # WORKDIR $BASE_DIR/cmd/windows
 # RUN go mod tidy
@@ -31,9 +29,8 @@ RUN set CGO_ENABLED=0& set GOOS=linux& set GOARCH=386& go build -a -o %NAME%_%VE
 # FROM mcr.microsoft.com/windows/nanoserver:20H2 as export-stage
 # ARG BASE_DIR
 # ARG NAME
-# ARG VERSION
 # WORKDIR $BASE_DIR
-# COPY --from=builder $BASE_DIR/cmd/bash/${NAME}_${VERSION}_darwin_amd_64 $BASE_DIR
-# COPY --from=builder $BASE_DIR/cmd/bash/${NAME}_${VERSION}_darwin_arm_64 $BASE_DIR
-# COPY --from=builder $BASE_DIR/cmd/bash/${NAME}_${VERSION}_linux_64 $BASE_DIR
-# COPY --from=builder $BASE_DIR/cmd/bash/${NAME}_${VERSION}_linux_32 $BASE_DIR
+# COPY --from=builder $BASE_DIR/cmd/bash/${NAME}_darwin_amd64 $BASE_DIR
+# COPY --from=builder $BASE_DIR/cmd/bash/${NAME}_darwin_arm64 $BASE_DIR
+# COPY --from=builder $BASE_DIR/cmd/bash/${NAME}_linux_64 $BASE_DIR
+# COPY --from=builder $BASE_DIR/cmd/bash/${NAME}_linux_32 $BASE_DIR
