@@ -131,10 +131,10 @@
                             <rules>
                                 <requireFilesExist>
                                     <files>
-                                        <file>${project.build.directory}/classes/durable_task_monitor_${revision}_darwin_amd_64</file>
-                                        <file>${project.build.directory}/classes/durable_task_monitor_${revision}_darwin_arm_64</file>
-                                        <file>${project.build.directory}/classes/durable_task_monitor_${revision}_linux_64</file>
-                                        <file>${project.build.directory}/classes/durable_task_monitor_${revision}_linux_32</file>
+                                        <file>${project.build.directory}/classes/durable_task_monitor_darwin_amd64</file>
+                                        <file>${project.build.directory}/classes/durable_task_monitor_darwin_arm64</file>
+                                        <file>${project.build.directory}/classes/durable_task_monitor_linux_64</file>
+                                        <file>${project.build.directory}/classes/durable_task_monitor_linux_32</file>
                                     </files>
                                 </requireFilesExist>
                             </rules>
