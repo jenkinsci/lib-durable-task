@@ -33,7 +33,7 @@
     </parent>
     <groupId>io.jenkins.plugins</groupId>
     <artifactId>lib-durable-task</artifactId>
-    <version>${revision}${changelist}</version>
+    <version>${changelist}</version>
     <name>Durable Task Library</name>
     <description>Generates and packages the binaries used by Durable Task Plugin</description>
     <url>https://github.com/jenkinsci/lib-durable-task</url>
@@ -45,8 +45,7 @@
     </licenses>
 
     <properties>
-        <revision>1.1</revision>
-        <changelist>-SNAPSHOT</changelist>
+        <changelist>999999-SNAPSHOT</changelist>
         <java.level>8</java.level>
     </properties>
 
