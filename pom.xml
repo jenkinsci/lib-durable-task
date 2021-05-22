@@ -103,7 +103,6 @@
                     <executable>${project.basedir}/src/${binary.generation.script}</executable>
                     <workingDirectory>${project.basedir}/src</workingDirectory>
                     <arguments>
-                        <argument>${revision}</argument>
                         <argument>${project.build.directory}/classes</argument>
                     </arguments>
                 </configuration>
