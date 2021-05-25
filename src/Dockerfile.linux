@@ -1,11 +1,9 @@
 ARG BASE_DIR=/durabletask
 ARG NAME=durable_task_monitor
-ARG VERSION=0.0
 
 FROM golang:1.16.4-buster AS builder
 ARG BASE_DIR
 ARG NAME
-ARG VERSION
 COPY cmd $BASE_DIR/cmd
 COPY pkg $BASE_DIR/pkg
 WORKDIR $BASE_DIR/pkg/common
@@ -14,10 +12,10 @@ RUN go test -v
 WORKDIR $BASE_DIR/cmd/bash
 RUN go mod tidy
 RUN go test -v
-RUN CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -a -o ${NAME}_${VERSION}_darwin_amd_64
-RUN CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -a -o ${NAME}_${VERSION}_darwin_arm_64
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o ${NAME}_${VERSION}_linux_64
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=386 go build -a -o ${NAME}_${VERSION}_linux_32
+RUN CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -a -o ${NAME}_darwin_amd64
+RUN CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -a -o ${NAME}_darwin_arm64
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o ${NAME}_linux_64
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=386 go build -a -o ${NAME}_linux_32
 # TODO WINDOWS
 # WORKDIR $BASE_DIR/cmd/windows
 # RUN go mod tidy
@@ -26,5 +24,4 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=386 go build -a -o ${NAME}_${VERSION}_linux_
 FROM scratch AS export-stage
 ARG BASE_DIR
 ARG NAME
-ARG VERSION
-COPY --from=builder $BASE_DIR/cmd/bash/${NAME}_${VERSION}_* /
+COPY --from=builder $BASE_DIR/cmd/bash/${NAME}_* /
