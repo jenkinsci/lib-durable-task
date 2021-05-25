@@ -24,4 +24,4 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=386 go build -a -o ${NAME}_linux_32
 FROM scratch AS export-stage
 ARG BASE_DIR
 ARG NAME
-COPY --from=builder $BASE_DIR/cmd/bash/${NAME}_* /
+COPY --from=builder $BASE_DIR/cmd/bash/${NAME}_*_* /
