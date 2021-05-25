@@ -47,6 +47,7 @@
     <properties>
         <changelist>999999-SNAPSHOT</changelist>
         <java.level>8</java.level>
+        <output.dir>${project.build.directory}/classes/io/jenkins/plugins/lib-durable-task</output.dir>
     </properties>
 
     <repositories>
@@ -102,7 +103,7 @@
                     <executable>${project.basedir}/src/${binary.generation.script}</executable>
                     <workingDirectory>${project.basedir}/src</workingDirectory>
                     <arguments>
-                        <argument>${project.build.directory}/classes</argument>
+                        <argument>${output.dir}</argument>
                     </arguments>
                 </configuration>
                 <executions>
@@ -130,10 +131,10 @@
                             <rules>
                                 <requireFilesExist>
                                     <files>
-                                        <file>${project.build.directory}/classes/durable_task_monitor_darwin_amd64</file>
-                                        <file>${project.build.directory}/classes/durable_task_monitor_darwin_arm64</file>
-                                        <file>${project.build.directory}/classes/durable_task_monitor_linux_64</file>
-                                        <file>${project.build.directory}/classes/durable_task_monitor_linux_32</file>
+                                        <file>${output.dir}/durable_task_monitor_darwin_amd64</file>
+                                        <file>${output.dir}/durable_task_monitor_darwin_arm64</file>
+                                        <file>${output.dir}/durable_task_monitor_linux_64</file>
+                                        <file>${output.dir}/durable_task_monitor_linux_32</file>
                                     </files>
                                 </requireFilesExist>
                             </rules>
