@@ -13,7 +13,7 @@ import (
 	"syscall"
 
 	"golang.org/x/sys/windows"
-        "jenkinsci.org/plugins/durabletask/common"
+	"jenkinsci.org/plugins/durabletask/common"
 )
 
 var logger *log.Logger
@@ -50,47 +50,48 @@ func launcher(wg *sync.WaitGroup, shell string, scriptPath string) {
 		}
 	}
 
-	/*
-		outputFile, err := os.Create("output.txt")
-		if err != nil {
-			logger.Println(err.Error())
-			return
-		}
-		defer outputFile.Close()
-		errFile, err := os.Create("err.txt")
-		if err != nil {
-			logger.Println(err.Error())
-			return
-		}
-		defer errFile.Close()
-	*/
+	outputFile, err := os.Create("output.txt")
+	if err != nil {
+		logger.Println(err.Error())
+		return
+	}
+	defer outputFile.Close()
+	errFile, err := os.Create("err.txt")
+	if err != nil {
+		logger.Println(err.Error())
+		return
+	}
+	defer errFile.Close()
 
-	var cmd *exec.Cmd
+	var scriptCmd *exec.Cmd
 	switch shell {
 	case CMD.String():
-		cmd = exec.Command("cmd.exe", "/C", scriptPath)
-		cmd.SysProcAttr = &syscall.SysProcAttr{CreationFlags: windows.DETACHED_PROCESS | windows.CREATE_NEW_PROCESS_GROUP}
+		scriptCmd = exec.Command("cmd.exe", "/C", scriptPath)
+		scriptCmd.SysProcAttr = &syscall.SysProcAttr{CreationFlags: windows.CREATE_NEW_PROCESS_GROUP}
 	case POWERSHELL.String():
-		shellCommand := fmt.Sprintf(". .\\powershellhelper.ps1; Execute-AndWriteOutput -MainScript .\\%s -Outputfile psOut.txt -LogFile psLog.txt -ResultFile psResult.txt -CaptureOutput;", scriptPath)
+		shellCommand := fmt.Sprintf("[Console]::OutputEncoding = [Text.Encoding]::UTF8; .\\%s", scriptPath)
 		logger.Printf("powershell command: %s", shellCommand)
-		cmd = exec.Command("powershell.exe", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-Command", shellCommand)
-			// ". .\\powershellhelper.ps1; Execute-AndWriteOutput -MainScript .\\basic.ps1 -Outputfile psOut.txt -LogFile psLog.txt -ResultFile psResult.txt -CaptureOutput;", scriptPath)
-		// ". \".\\powershellhelper.ps1\"; Execute-AndWriteOutput -MainScript \".\\basic.ps1\" -Outputfile \"psOut.txt\" -LogFile \"psLog.txt\" -ResultFile \"psResult.txt\" -CaptureOutput;")
-		// cmd.SysProcAttr = &syscall.SysProcAttr{CreationFlags: windows.DETACHED_PROCESS | windows.CREATE_NEW_PROCESS_GROUP}
+		scriptCmd = exec.Command("powershell.exe", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-Command", shellCommand)
+		scriptCmd.SysProcAttr = &syscall.SysProcAttr{CreationFlags: windows.CREATE_NEW_PROCESS_GROUP}
 	case PWSH.String():
 	default:
 		logger.Println("shell type not supported")
 		return
 	}
-	cmd.Stdout = nil //outputFile
-	cmd.Stderr = nil //errFile
+	// Note: Go writes the output in utf8 WITHOUT a bom. No need for any encoding conversions
+	scriptCmd.Stdout = outputFile
+	scriptCmd.Stderr = errFile
 
 	logger.Println("about to launch command")
-	err := cmd.Run()
+	err = scriptCmd.Run()
 	if err != nil {
-		logger.Fatalf("cmd.Run() failed with %s\n", err)
+		logger.Printf("cmd.Run() failed with %s\n", err)
 	}
 	logger.Println("command finished")
+
+	resultVal := scriptCmd.ProcessState.ExitCode()
+	logger.Printf("script exit code: %v\n", resultVal)
+	common.ExitLauncher(resultVal, "result.txt", logger)
 }
 
 func main() {
