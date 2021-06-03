@@ -97,14 +97,16 @@ func launcher(wg *sync.WaitGroup, exitChan chan bool, shell string,
 }
 
 func main() {
-	var resultPath, logPath, shell, scriptPath string
+	var controlDir, resultPath, logPath, shell, scriptPath string
 	var debug, daemon bool
+	const controlFlag = "controldir"
 	const resultFlag = "result"
 	const logFlag = "log"
 	const shellFlag = "shell"
 	const scriptPathFlag = "script"
 	const debugFlag = "debug"
 	const daemonFlag = "daemon"
+	flag.StringVar(&controlDir, controlFlag, "", "working directory")
 	flag.StringVar(&resultPath, resultFlag, "", "full path of the result file")
 	flag.StringVar(&logPath, logFlag, "", "full path of the log file")
 	flag.StringVar(&shell, shellFlag, "cmd", "Windows shell type")
@@ -143,7 +145,7 @@ func main() {
 		return
 	}
 	defer logFile.Close()
-	mainLogger, _, launchLogger, scriptLogger := common.PrepareLogging(logFile, debug)
+	mainLogger, hbLogger, launchLogger, scriptLogger := common.PrepareLogging(logFile, debug)
 
 	for key, val := range defined {
 		mainLogger.Printf("%v: %v", key, val)
@@ -157,11 +159,9 @@ func main() {
 
 	exitChan := make(chan bool)
 	var wg sync.WaitGroup
-	wg.Add(1)
+	wg.Add(2)
 	go launcher(&wg, exitChan, shell, scriptPath, resultPath, launchLogger, scriptLogger)
-	// TEMP until we add heartbeat: Must access the channel else it blocks launcher
-	channelResult := <-exitChan
-	mainLogger.Printf("exit chan is %v\n", channelResult)
+	go common.Heartbeat(&wg, exitChan, controlDir, resultPath, logPath, hbLogger)
 	wg.Wait()
 	signal.Stop(sigChan)
 	close(sigChan)
