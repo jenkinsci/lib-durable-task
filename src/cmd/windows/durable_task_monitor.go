@@ -38,9 +38,11 @@ func (shell Shell) String() string {
 }
 
 // Launches the script in a new session and waits for its completion.
-func launcher(wg *sync.WaitGroup, shell string, scriptPath string,
+func launcher(wg *sync.WaitGroup, exitChan chan bool, shell string, scriptPath string,
 	launchLogger *log.Logger, scriptLogger *log.Logger) {
+
 	defer wg.Done()
+	defer common.SignalFinished(exitChan)
 
 	if _, err := os.Stat(scriptPath); err != nil {
 		if os.IsNotExist(err) {
@@ -150,9 +152,13 @@ func main() {
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 	go common.SignalCatcher(sigChan, mainLogger)
 
+	exitChan := make(chan bool)
 	var wg sync.WaitGroup
 	wg.Add(1)
-	go launcher(&wg, shell, scriptPath, launchLogger, scriptLogger)
+	go launcher(&wg, exitChan, shell, scriptPath, launchLogger, scriptLogger)
+	// TEMP until we add heartbeat: Must access the channel else it blocks launcher
+	channelResult := <-exitChan
+	mainLogger.Printf("exit chan is %v\n", channelResult)
 	wg.Wait()
 	signal.Stop(sigChan)
 	close(sigChan)
