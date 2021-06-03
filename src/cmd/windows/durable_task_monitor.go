@@ -38,7 +38,8 @@ func (shell Shell) String() string {
 }
 
 // Launches the script in a new session and waits for its completion.
-func launcher(wg *sync.WaitGroup, exitChan chan bool, shell string, scriptPath string,
+func launcher(wg *sync.WaitGroup, exitChan chan bool, shell string,
+	scriptPath string, resultPath string,
 	launchLogger *log.Logger, scriptLogger *log.Logger) {
 
 	defer wg.Done()
@@ -92,17 +93,19 @@ func launcher(wg *sync.WaitGroup, exitChan chan bool, shell string, scriptPath s
 
 	resultVal := scriptCmd.ProcessState.ExitCode()
 	launchLogger.Printf("script exit code: %v\n", resultVal)
-	common.ExitLauncher(resultVal, "result.txt", launchLogger)
+	common.ExitLauncher(resultVal, resultPath, launchLogger)
 }
 
 func main() {
-	var logPath, shell, scriptPath string
+	var resultPath, logPath, shell, scriptPath string
 	var debug, daemon bool
+	const resultFlag = "result"
 	const logFlag = "log"
 	const shellFlag = "shell"
 	const scriptPathFlag = "script"
 	const debugFlag = "debug"
 	const daemonFlag = "daemon"
+	flag.StringVar(&resultPath, resultFlag, "", "full path of the result file")
 	flag.StringVar(&logPath, logFlag, "", "full path of the log file")
 	flag.StringVar(&shell, shellFlag, "cmd", "Windows shell type")
 	flag.StringVar(&scriptPath, scriptPathFlag, "", "full path of the script to be launched")
@@ -155,7 +158,7 @@ func main() {
 	exitChan := make(chan bool)
 	var wg sync.WaitGroup
 	wg.Add(1)
-	go launcher(&wg, exitChan, shell, scriptPath, launchLogger, scriptLogger)
+	go launcher(&wg, exitChan, shell, scriptPath, resultPath, launchLogger, scriptLogger)
 	// TEMP until we add heartbeat: Must access the channel else it blocks launcher
 	channelResult := <-exitChan
 	mainLogger.Printf("exit chan is %v\n", channelResult)
