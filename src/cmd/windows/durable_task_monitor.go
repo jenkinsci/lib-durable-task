@@ -16,8 +16,6 @@ import (
 	"jenkinsci.org/plugins/durabletask/common"
 )
 
-var logger *log.Logger
-
 type Shell int
 
 const (
@@ -40,25 +38,26 @@ func (shell Shell) String() string {
 }
 
 // Launches the script in a new session and waits for its completion.
-func launcher(wg *sync.WaitGroup, shell string, scriptPath string) {
+func launcher(wg *sync.WaitGroup, shell string, scriptPath string,
+	launchLogger *log.Logger, scriptLogger *log.Logger) {
 	defer wg.Done()
 
 	if _, err := os.Stat(scriptPath); err != nil {
 		if os.IsNotExist(err) {
-			logger.Printf("%s does not exist", scriptPath)
+			launchLogger.Printf("%s does not exist", scriptPath)
 			return
 		}
 	}
 
 	outputFile, err := os.Create("output.txt")
 	if err != nil {
-		logger.Println(err.Error())
+		launchLogger.Println(err.Error())
 		return
 	}
 	defer outputFile.Close()
 	errFile, err := os.Create("err.txt")
 	if err != nil {
-		logger.Println(err.Error())
+		launchLogger.Println(err.Error())
 		return
 	}
 	defer errFile.Close()
@@ -67,42 +66,46 @@ func launcher(wg *sync.WaitGroup, shell string, scriptPath string) {
 	switch shell {
 	case CMD.String():
 		scriptCmd = exec.Command("cmd.exe", "/C", scriptPath)
-		scriptCmd.SysProcAttr = &syscall.SysProcAttr{CreationFlags: windows.CREATE_NEW_PROCESS_GROUP}
 	case POWERSHELL.String():
 		shellCommand := fmt.Sprintf("[Console]::OutputEncoding = [Text.Encoding]::UTF8; .\\%s", scriptPath)
-		logger.Printf("powershell command: %s", shellCommand)
 		scriptCmd = exec.Command("powershell.exe", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-Command", shellCommand)
-		scriptCmd.SysProcAttr = &syscall.SysProcAttr{CreationFlags: windows.CREATE_NEW_PROCESS_GROUP}
 	case PWSH.String():
 	default:
-		logger.Println("shell type not supported")
+		launchLogger.Println("shell type not supported")
 		return
 	}
+	scriptCmd.SysProcAttr = &syscall.SysProcAttr{CreationFlags: windows.CREATE_NEW_PROCESS_GROUP}
 	// Note: Go writes the output in utf8 WITHOUT a bom. No need for any encoding conversions
 	scriptCmd.Stdout = outputFile
 	scriptCmd.Stderr = errFile
 
-	logger.Println("about to launch command")
+	for i := 0; i < len(scriptCmd.Args); i++ {
+		launchLogger.Printf("args %v: %v\n", i, scriptCmd.Args[i])
+	}
 	err = scriptCmd.Run()
 	if err != nil {
-		logger.Printf("cmd.Run() failed with %s\n", err)
+		launchLogger.Printf("cmd.Run() failed with %s\n", err)
 	}
-	logger.Println("command finished")
+	launchLogger.Println("command finished")
 
 	resultVal := scriptCmd.ProcessState.ExitCode()
-	logger.Printf("script exit code: %v\n", resultVal)
-	common.ExitLauncher(resultVal, "result.txt", logger)
+	launchLogger.Printf("script exit code: %v\n", resultVal)
+	common.ExitLauncher(resultVal, "result.txt", launchLogger)
 }
 
 func main() {
-	var daemon bool
-	var shell, scriptPath string
-	const daemonFlag = "daemon"
+	var logPath, shell, scriptPath string
+	var debug, daemon bool
+	const logFlag = "log"
 	const shellFlag = "shell"
-	const scriptPathFlag = "path"
-	flag.BoolVar(&daemon, daemonFlag, false, "Free binary from parent process")
+	const scriptPathFlag = "script"
+	const debugFlag = "debug"
+	const daemonFlag = "daemon"
+	flag.StringVar(&logPath, logFlag, "", "full path of the log file")
 	flag.StringVar(&shell, shellFlag, "cmd", "Windows shell type")
 	flag.StringVar(&scriptPath, scriptPathFlag, "", "full path of the script to be launched")
+	flag.BoolVar(&debug, debugFlag, false, "noisy output to log")
+	flag.BoolVar(&daemon, daemonFlag, false, "Free binary from parent process")
 	flag.Parse()
 
 	// Validate that the required flags were all command-line defined
@@ -129,25 +132,29 @@ func main() {
 		return
 	}
 	// Prepare logging
-	logFile, logErr := os.Create("logging.txt")
+	logFile, logErr := os.Create(logPath)
 	if logErr != nil {
 		fmt.Fprintf(os.Stderr, "Unable to create log file: %s", logErr)
 		return
 	}
 	defer logFile.Close()
-	logger = log.New(logFile, "MAIN ", log.Lmicroseconds|log.Lshortfile)
-	logger.Printf("binary pid is: %v\n", os.Getpid())
-	logger.Printf("parent pid is: %v\n", os.Getppid())
+	mainLogger, _, launchLogger, scriptLogger := common.PrepareLogging(logFile, debug)
+
+	for key, val := range defined {
+		mainLogger.Printf("%v: %v", key, val)
+	}
+	mainLogger.Printf("Main pid is: %v\n", os.Getpid())
+	mainLogger.Printf("Parent pid is: %v\n", os.Getppid())
 
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-	go common.SignalCatcher(sigChan, logger)
+	go common.SignalCatcher(sigChan, mainLogger)
 
 	var wg sync.WaitGroup
 	wg.Add(1)
-	go launcher(&wg, shell, scriptPath)
+	go launcher(&wg, shell, scriptPath, launchLogger, scriptLogger)
 	wg.Wait()
 	signal.Stop(sigChan)
 	close(sigChan)
-	logger.Println("done.")
+	mainLogger.Println("done.")
 }
