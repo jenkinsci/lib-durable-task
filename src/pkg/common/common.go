@@ -29,7 +29,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"os/exec"
 	"strconv"
 	"sync"
 	"time"
@@ -159,21 +158,4 @@ func ExitLauncher(exitCode int, resultPath string, logger *log.Logger) {
 	CheckIfErr(logger, err)
 	err = resultFile.Close()
 	CheckIfErr(logger, err)
-}
-
-func SetCmdOut(cmd *exec.Cmd, outputPath string, resultPath string, logger *log.Logger) {
-	if outputPath != "" {
-		// capturing output
-		outputFile, err := os.Create(outputPath)
-		if CheckIfErr(logger, err) {
-			ExitLauncher(-2, resultPath, logger)
-			return
-		}
-		defer outputFile.Close()
-		cmd.Stdout = outputFile
-		cmd.Stderr = logger.Writer()
-	} else {
-		cmd.Stdout = logger.Writer()
-		cmd.Stderr = cmd.Stdout
-	}
 }
