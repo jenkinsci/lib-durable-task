@@ -135,6 +135,8 @@
                                         <file>${output.dir}/durable_task_monitor_darwin_arm64</file>
                                         <file>${output.dir}/durable_task_monitor_linux_64</file>
                                         <file>${output.dir}/durable_task_monitor_linux_32</file>
+                                        <file>${output.dir}/durable_task_monitor_win_64.exe</file>
+                                        <file>${output.dir}/durable_task_monitor_win_32.exe</file>
                                     </files>
                                 </requireFilesExist>
                             </rules>

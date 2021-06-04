@@ -24,8 +24,8 @@ WORKDIR $BASE_DIR/cmd/windows
 RUN go get -modcacherw jenkinsci.org/plugins/durabletask/common
 RUN go get -modcacherw golang.org/x/sys@v0.0.0-20210514084401-e8d321eab015
 RUN go test -v
-RUN set CGO_ENABLED=0& set GOOS=windows& set GOARCH=amd64& go build -a -o %NAME%_win_64
-RUN set CGO_ENABLED=0& set GOOS=windows& set GOARCH=386& go build -a -o %NAME%_win_32
+RUN set CGO_ENABLED=0& set GOOS=windows& set GOARCH=amd64& go build -a -o %NAME%_win_64.exe
+RUN set CGO_ENABLED=0& set GOOS=windows& set GOARCH=386& go build -a -o %NAME%_win_32.exe
 
 # TODO: uncomment once docker build --output (i.e. BuildKit) is available for windows containers
 # see: https://github.com/microsoft/Windows-Containers/issues/34
