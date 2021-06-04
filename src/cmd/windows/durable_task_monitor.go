@@ -52,19 +52,6 @@ func launcher(wg *sync.WaitGroup, exitChan chan bool, shell string,
 		}
 	}
 
-	outputFile, err := os.Create(outputPath)
-	if err != nil {
-		launchLogger.Println(err.Error())
-		return
-	}
-	defer outputFile.Close()
-	errFile, err := os.Create("err.txt")
-	if err != nil {
-		launchLogger.Println(err.Error())
-		return
-	}
-	defer errFile.Close()
-
 	var scriptCmd *exec.Cmd
 	switch shell {
 	case CMD.String():
@@ -78,14 +65,28 @@ func launcher(wg *sync.WaitGroup, exitChan chan bool, shell string,
 		return
 	}
 	scriptCmd.SysProcAttr = &syscall.SysProcAttr{CreationFlags: windows.CREATE_NEW_PROCESS_GROUP}
-	// Note: Go writes the output in utf8 WITHOUT a bom. No need for any encoding conversions
-	scriptCmd.Stdout = outputFile
-	scriptCmd.Stderr = errFile
+
+	if outputPath != "" {
+		// capturing output
+		outputFile, err := os.Create(outputPath)
+		if err != nil {
+			launchLogger.Println(err.Error())
+			return
+		}
+		defer outputFile.Close()
+
+		// Note: Go writes the output in utf8 WITHOUT a bom. No need for any encoding conversions
+		scriptCmd.Stdout = outputFile
+		scriptCmd.Stderr = scriptLogger.Writer()
+	} else {
+		scriptCmd.Stdout = scriptLogger.Writer()
+		scriptCmd.Stderr = scriptCmd.Stdout
+	}
 
 	for i := 0; i < len(scriptCmd.Args); i++ {
 		launchLogger.Printf("args %v: %v\n", i, scriptCmd.Args[i])
 	}
-	err = scriptCmd.Start()
+	err := scriptCmd.Start()
 	if common.CheckIfErr(scriptLogger, err) {
 		common.ExitLauncher(-2, resultPath, scriptLogger)
 		return
