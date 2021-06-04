@@ -31,6 +31,10 @@ func sendSignal(pid int) {
 
 // windows interrupt signals cannot be sent from a program.
 // see: github.com/golang/go/issues/6720
+// IMPORTANT: This test will fail in CI because:
+//   1) only works on windows container versions > ltsc2019 (https://github.com/docker/for-win/issues/3173)
+//   2) will still fail when being executed as RUN command in dockerfile
+// Test works correctly when running locally
 func ExampleSignalCatcher() {
 	logger := log.New(os.Stdout, "", 0)
 	sigChan := make(chan os.Signal, 1)
