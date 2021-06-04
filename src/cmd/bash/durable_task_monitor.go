@@ -87,7 +87,7 @@ func launcher(wg *sync.WaitGroup, exitChan chan bool, cookieName string, cookieV
 	resultVal := scriptCmd.ProcessState.ExitCode()
 	launchLogger.Printf("script exit code: %v\n", resultVal)
 
-	common.ExitLauncher(resultVal, resultPath, scriptLogger)
+	common.ExitLauncher(resultVal, resultPath, launchLogger)
 }
 
 // Launches a script in a new session and monitors its running status. This program should
