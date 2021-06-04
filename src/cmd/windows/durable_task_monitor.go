@@ -39,7 +39,7 @@ func (shell Shell) String() string {
 
 // Launches the script in a new session and waits for its completion.
 func launcher(wg *sync.WaitGroup, exitChan chan bool, shell string,
-	scriptPath string, resultPath string,
+	scriptPath string, resultPath string, outputPath string,
 	launchLogger *log.Logger, scriptLogger *log.Logger) {
 
 	defer wg.Done()
@@ -52,7 +52,7 @@ func launcher(wg *sync.WaitGroup, exitChan chan bool, shell string,
 		}
 	}
 
-	outputFile, err := os.Create("output.txt")
+	outputFile, err := os.Create(outputPath)
 	if err != nil {
 		launchLogger.Println(err.Error())
 		return
@@ -85,38 +85,45 @@ func launcher(wg *sync.WaitGroup, exitChan chan bool, shell string,
 	for i := 0; i < len(scriptCmd.Args); i++ {
 		launchLogger.Printf("args %v: %v\n", i, scriptCmd.Args[i])
 	}
-	err = scriptCmd.Run()
-	if err != nil {
-		launchLogger.Printf("cmd.Run() failed with %s\n", err)
+	err = scriptCmd.Start()
+	if common.CheckIfErr(scriptLogger, err) {
+		common.ExitLauncher(-2, resultPath, scriptLogger)
+		return
 	}
-	launchLogger.Println("command finished")
-
+	pid := scriptCmd.Process.Pid
+	launchLogger.Printf("launched %v\n", pid)
+	err = scriptCmd.Wait()
+	common.CheckIfErr(scriptLogger, err)
 	resultVal := scriptCmd.ProcessState.ExitCode()
 	launchLogger.Printf("script exit code: %v\n", resultVal)
+
 	common.ExitLauncher(resultVal, resultPath, launchLogger)
 }
 
 func main() {
-	var controlDir, resultPath, logPath, shell, scriptPath string
+	var controlDir, resultPath, logPath, shell, scriptPath, outputPath string
 	var debug, daemon bool
 	const controlFlag = "controldir"
 	const resultFlag = "result"
 	const logFlag = "log"
 	const shellFlag = "shell"
 	const scriptPathFlag = "script"
+	const outputFlag = "output"
 	const debugFlag = "debug"
 	const daemonFlag = "daemon"
 	flag.StringVar(&controlDir, controlFlag, "", "working directory")
 	flag.StringVar(&resultPath, resultFlag, "", "full path of the result file")
 	flag.StringVar(&logPath, logFlag, "", "full path of the log file")
-	flag.StringVar(&shell, shellFlag, "cmd", "Windows shell type")
 	flag.StringVar(&scriptPath, scriptPathFlag, "", "full path of the script to be launched")
+	flag.StringVar(&shell, shellFlag, "cmd", "Windows shell type")
+	flag.StringVar(&outputPath, outputFlag, "", "(optional) if recording output, full path of the output file")
 	flag.BoolVar(&debug, debugFlag, false, "noisy output to log")
 	flag.BoolVar(&daemon, daemonFlag, false, "Free binary from parent process")
 	flag.Parse()
 
 	// Validate that the required flags were all command-line defined
-	required := []string{scriptPathFlag}
+	// required := []string{scriptPathFlag}
+	required := []string{controlFlag, resultFlag, logFlag, scriptPathFlag}
 	defined := make(map[string]string)
 	flag.Visit(func(f *flag.Flag) {
 		defined[f.Name] = f.Value.String()
@@ -160,9 +167,11 @@ func main() {
 	exitChan := make(chan bool)
 	var wg sync.WaitGroup
 	wg.Add(2)
-	go launcher(&wg, exitChan, shell, scriptPath, resultPath, launchLogger, scriptLogger)
+	go launcher(&wg, exitChan, shell, scriptPath, resultPath, outputPath, launchLogger, scriptLogger)
 	go common.Heartbeat(&wg, exitChan, controlDir, resultPath, logPath, hbLogger)
+	mainLogger.Println("about to wait")
 	wg.Wait()
+	mainLogger.Println("done waiting")
 	signal.Stop(sigChan)
 	close(sigChan)
 	mainLogger.Println("done.")
