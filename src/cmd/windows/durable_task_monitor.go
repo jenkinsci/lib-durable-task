@@ -53,18 +53,24 @@ func launcher(wg *sync.WaitGroup, exitChan chan bool, shell string,
 	}
 
 	var scriptCmd *exec.Cmd
+	var sysAttr windows.SysProcAttr
+
+	sysAttr.CreationFlags = windows.CREATE_NEW_PROCESS_GROUP
 	switch shell {
 	case CMD.String():
-		scriptCmd = exec.Command("cmd.exe", "/C", scriptPath)
+		scriptCmd = exec.Command("cmd.exe")
+		sysAttr.CmdLine = "cmd.exe /C call \"" + scriptPath + "\""
 	case POWERSHELL.String():
 		shellCommand := fmt.Sprintf("[Console]::OutputEncoding = [Text.Encoding]::UTF8; .\\%s", scriptPath)
 		scriptCmd = exec.Command("powershell.exe", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-Command", shellCommand)
 	case PWSH.String():
+		launchLogger.Println("Callin bare cmd")
+		scriptCmd = exec.Command(scriptPath)
 	default:
 		launchLogger.Println("shell type not supported")
 		return
 	}
-	scriptCmd.SysProcAttr = &syscall.SysProcAttr{CreationFlags: windows.CREATE_NEW_PROCESS_GROUP}
+	scriptCmd.SysProcAttr = &sysAttr
 
 	if outputPath != "" {
 		// capturing output
