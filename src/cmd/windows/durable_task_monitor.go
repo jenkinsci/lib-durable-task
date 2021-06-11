@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
+	"strings"
 	"sync"
 	"syscall"
 
@@ -16,59 +17,24 @@ import (
 	"jenkinsci.org/plugins/durabletask/common"
 )
 
-type Shell int
-
-const (
-	CMD Shell = iota
-	POWERSHELL
-	PWSH
-)
-
-func (shell Shell) String() string {
-	switch shell {
-	case CMD:
-		return "cmd"
-	case POWERSHELL:
-		return "powershell"
-	case PWSH:
-		return "pwsh"
-	default:
-		return "UNKNOWN"
-	}
-}
-
 // Launches the script in a new session and waits for its completion.
-func launcher(wg *sync.WaitGroup, exitChan chan bool, shell string,
-	scriptPath string, resultPath string, outputPath string,
+func launcher(wg *sync.WaitGroup, exitChan chan bool,
+	executable string, args string, resultPath string, outputPath string,
 	launchLogger *log.Logger, scriptLogger *log.Logger) {
 
 	defer wg.Done()
 	defer common.SignalFinished(exitChan)
 
-	if _, err := os.Stat(scriptPath); err != nil {
-		if os.IsNotExist(err) {
-			launchLogger.Printf("%s does not exist", scriptPath)
-			return
-		}
-	}
-
 	var scriptCmd *exec.Cmd
 	var sysAttr windows.SysProcAttr
 
 	sysAttr.CreationFlags = windows.CREATE_NEW_PROCESS_GROUP
-	switch shell {
-	case CMD.String():
-		scriptCmd = exec.Command("cmd.exe")
-		sysAttr.CmdLine = "cmd.exe /C call \"" + scriptPath + "\""
-	case POWERSHELL.String():
-		shellCommand := fmt.Sprintf("[Console]::OutputEncoding = [Text.Encoding]::UTF8; .\\%s", scriptPath)
-		scriptCmd = exec.Command("powershell.exe", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-Command", shellCommand)
-	case PWSH.String():
-		launchLogger.Println("Callin bare cmd")
-		scriptCmd = exec.Command(scriptPath)
-	default:
-		launchLogger.Println("shell type not supported")
-		return
+	if executable == "cmd" {
+		scriptCmd = exec.Command(executable)
+		sysAttr.CmdLine = executable + " " + args
+	} else {
+		fmt.Println(strings.Split(args, ","))
+		scriptCmd = exec.Command(executable, strings.Split(args, ",")...)
 	}
 	scriptCmd.SysProcAttr = &sysAttr
 
@@ -108,29 +74,28 @@ func launcher(wg *sync.WaitGroup, exitChan chan bool, shell string,
 }
 
 func main() {
-	var controlDir, resultPath, logPath, shell, scriptPath, outputPath string
+	var controlDir, resultPath, logPath, executable, args, outputPath string
 	var debug, daemon bool
 	const controlFlag = "controldir"
 	const resultFlag = "result"
 	const logFlag = "log"
-	const shellFlag = "shell"
-	const scriptPathFlag = "script"
+	const executableFlag = "executable"
+	const argsFlag = "args"
 	const outputFlag = "output"
 	const debugFlag = "debug"
 	const daemonFlag = "daemon"
 	flag.StringVar(&controlDir, controlFlag, "", "working directory")
 	flag.StringVar(&resultPath, resultFlag, "", "full path of the result file")
 	flag.StringVar(&logPath, logFlag, "", "full path of the log file")
-	flag.StringVar(&scriptPath, scriptPathFlag, "", "full path of the script to be launched")
-	flag.StringVar(&shell, shellFlag, "cmd", "Windows shell type")
+	flag.StringVar(&executable, executableFlag, "", "path to the executable being launched")
+	flag.StringVar(&args, argsFlag, "", "(optional) argument(s) to the executable, separated by commas with no spaces")
 	flag.StringVar(&outputPath, outputFlag, "", "(optional) if recording output, full path of the output file")
-	flag.BoolVar(&debug, debugFlag, false, "noisy output to log")
-	flag.BoolVar(&daemon, daemonFlag, false, "Free binary from parent process")
+	flag.BoolVar(&debug, debugFlag, false, "(optional) noisy output to log")
+	flag.BoolVar(&daemon, daemonFlag, false, "(optional) Free binary from parent process")
 	flag.Parse()
 
 	// Validate that the required flags were all command-line defined
-	// required := []string{scriptPathFlag}
-	required := []string{controlFlag, resultFlag, logFlag, scriptPathFlag}
+	required := []string{controlFlag, resultFlag, logFlag, executableFlag}
 	defined := make(map[string]string)
 	flag.Visit(func(f *flag.Flag) {
 		defined[f.Name] = f.Value.String()
@@ -174,7 +139,7 @@ func main() {
 	exitChan := make(chan bool)
 	var wg sync.WaitGroup
 	wg.Add(2)
-	go launcher(&wg, exitChan, shell, scriptPath, resultPath, outputPath, launchLogger, scriptLogger)
+	go launcher(&wg, exitChan, executable, args, resultPath, outputPath, launchLogger, scriptLogger)
 	go common.Heartbeat(&wg, exitChan, controlDir, resultPath, logPath, hbLogger)
 	mainLogger.Println("about to wait")
 	wg.Wait()
