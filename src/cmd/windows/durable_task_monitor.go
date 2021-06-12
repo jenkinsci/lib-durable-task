@@ -118,7 +118,6 @@ func main() {
 		if doubleLaunchErr != nil {
 			panic("Double launch failed, exiting")
 		}
-		common.RecordExit(-2, resultPath, log.Default())
 		return
 	}
 	// Prepare logging
