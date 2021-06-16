@@ -60,6 +60,8 @@ func launcher(wg *sync.WaitGroup, exitChan chan bool, cookieName string, cookieV
 		// capturing output
 		outputFile, err := os.Create(outputPath)
 		if common.CheckIfErr(scriptLogger, err) {
+			launchLogger.Println(err.Error())
+			common.RecordExit(-2, resultPath, launchLogger)
 			return
 		}
 		defer outputFile.Close()
