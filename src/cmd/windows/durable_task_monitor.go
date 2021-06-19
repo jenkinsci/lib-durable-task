@@ -33,8 +33,9 @@ func launcher(wg *sync.WaitGroup, exitChan chan bool,
 		scriptCmd = exec.Command(executable)
 		sysAttr.CmdLine = executable + " " + args
 	} else {
-		fmt.Println(strings.Split(args, ","))
-		scriptCmd = exec.Command(executable, strings.Split(args, ",")...)
+		// Delimiter is a common WITH a space to handle complex arguments that require commas. For example, an argument that includes a method
+		// call with args separated by a comma. The method args can be separated by commas with NO space so they do not accidentally get split
+		scriptCmd = exec.Command(executable, strings.Split(args, ", ")...)
 	}
 	scriptCmd.SysProcAttr = &sysAttr
 
@@ -89,7 +90,7 @@ func main() {
 	flag.StringVar(&resultPath, resultFlag, "", "full path of the result file")
 	flag.StringVar(&logPath, logFlag, "", "full path of the log file")
 	flag.StringVar(&executable, executableFlag, "", "path to the executable being launched")
-	flag.StringVar(&args, argsFlag, "", "(optional) argument(s) to the executable, separated by commas with no spaces")
+	flag.StringVar(&args, argsFlag, "", "(optional) argument(s) to the executable, separated by commas WITH spaces")
 	flag.StringVar(&outputPath, outputFlag, "", "(optional) if recording output, full path of the output file")
 	flag.BoolVar(&debug, debugFlag, false, "(optional) noisy output to log")
 	flag.BoolVar(&daemon, daemonFlag, false, "(optional) Free binary from parent process")
