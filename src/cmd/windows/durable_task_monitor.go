@@ -28,12 +28,12 @@ func launcher(wg *sync.WaitGroup, exitChan chan bool,
 	var scriptCmd *exec.Cmd
 	var sysAttr windows.SysProcAttr
 
-	sysAttr.CreationFlags = windows.CREATE_NEW_PROCESS_GROUP
+	sysAttr.HideWindow = true
 	if executable == "cmd" {
 		scriptCmd = exec.Command(executable)
 		sysAttr.CmdLine = executable + " " + args
 	} else {
-		// Delimiter is a common WITH a space to handle complex arguments that require commas. For example, an argument that includes a method
+		// Delimiter is a comma WITH a space to handle complex arguments that require commas. For example, an argument that includes a method
 		// call with args separated by a comma. The method args can be separated by commas with NO space so they do not accidentally get split
 		scriptCmd = exec.Command(executable, strings.Split(args, ", ")...)
 	}
@@ -112,9 +112,14 @@ func main() {
 		fmt.Fprintf(os.Stdout, "1st launch pid is: %v\n", os.Getpid())
 		rebuiltArgs := common.RebuildArgs(defined, daemonFlag)
 		doubleLaunchCmd := exec.Command(os.Args[0], rebuiltArgs...)
+		doubleLaunchCmd.Stdin = nil
 		doubleLaunchCmd.Stdout = nil
 		doubleLaunchCmd.Stderr = nil
-		doubleLaunchCmd.SysProcAttr = &syscall.SysProcAttr{CreationFlags: windows.DETACHED_PROCESS | windows.CREATE_NEW_PROCESS_GROUP}
+		var sysAttr windows.SysProcAttr
+		sysAttr.HideWindow = true
+		sysAttr.CreationFlags = windows.CREATE_NEW_PROCESS_GROUP
+		sysAttr.NoInheritHandles = true
+		doubleLaunchCmd.SysProcAttr = &sysAttr
 		doubleLaunchErr := doubleLaunchCmd.Start()
 		if doubleLaunchErr != nil {
 			panic("Double launch failed, exiting")
