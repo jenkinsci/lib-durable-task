@@ -60,7 +60,8 @@ func launcher(wg *sync.WaitGroup, exitChan chan bool, cookieName string, cookieV
 		// capturing output
 		outputFile, err := os.Create(outputPath)
 		if common.CheckIfErr(scriptLogger, err) {
-			common.ExitLauncher(-2, resultPath, scriptLogger)
+			launchLogger.Println(err.Error())
+			common.RecordExit(-2, resultPath, launchLogger)
 			return
 		}
 		defer outputFile.Close()
@@ -77,7 +78,7 @@ func launcher(wg *sync.WaitGroup, exitChan chan bool, cookieName string, cookieV
 	}
 	err := scriptCmd.Start()
 	if common.CheckIfErr(scriptLogger, err) {
-		common.ExitLauncher(-2, resultPath, scriptLogger)
+		common.RecordExit(-2, resultPath, scriptLogger)
 		return
 	}
 	pid := scriptCmd.Process.Pid
@@ -87,7 +88,7 @@ func launcher(wg *sync.WaitGroup, exitChan chan bool, cookieName string, cookieV
 	resultVal := scriptCmd.ProcessState.ExitCode()
 	launchLogger.Printf("script exit code: %v\n", resultVal)
 
-	common.ExitLauncher(resultVal, resultPath, scriptLogger)
+	common.RecordExit(resultVal, resultPath, launchLogger)
 }
 
 // Launches a script in a new session and monitors its running status. This program should
@@ -124,7 +125,9 @@ func main() {
 	flag.Visit(func(f *flag.Flag) {
 		defined[f.Name] = f.Value.String()
 	})
-	common.ValidateFlags(defined, required)
+	if !common.ValidateFlags(defined, required) {
+		os.Exit(1)
+	}
 
 	// Double launch to free from parent process. Using a flag because it is possible for parent PID = 1 (i.e. Docker with no init process)
 	if daemon {
@@ -144,6 +147,7 @@ func main() {
 	logFile, logErr := os.Create(logPath)
 	if logErr != nil {
 		fmt.Fprintf(os.Stderr, "LAUNCHER: %v\n", logErr.Error())
+		common.RecordExit(-2, resultPath, log.Default())
 		return
 	}
 	defer logFile.Close()

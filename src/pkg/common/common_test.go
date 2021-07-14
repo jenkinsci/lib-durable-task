@@ -210,7 +210,7 @@ func TestHeartbeatResultFound(t *testing.T) {
 	}
 }
 
-func TestExitLauncher(t *testing.T) {
+func TestRecordExit(t *testing.T) {
 	currentDir, err := os.Getwd()
 	if err != nil {
 		t.Error(err)
@@ -219,7 +219,7 @@ func TestExitLauncher(t *testing.T) {
 	// make sure no old result files remain
 	os.Remove(resultPath)
 
-	common.ExitLauncher(-12345678, resultPath, log.New(os.Stdout, "", 0))
+	common.RecordExit(-12345678, resultPath, log.New(os.Stdout, "", 0))
 	data, err := ioutil.ReadFile(resultPath)
 	if err != nil {
 		t.Error(err)
@@ -229,7 +229,7 @@ func TestExitLauncher(t *testing.T) {
 	}
 
 	// Leave old result file present
-	common.ExitLauncher(99999, resultPath, log.New(os.Stdout, "", 0))
+	common.RecordExit(99999, resultPath, log.New(os.Stdout, "", 0))
 	data, err = ioutil.ReadFile(resultPath)
 	if err != nil {
 		t.Error(err)

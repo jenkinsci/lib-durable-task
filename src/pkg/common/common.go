@@ -118,6 +118,7 @@ func Heartbeat(wg *sync.WaitGroup, exitChan chan bool,
 	controlDir string, resultPath string, logPath string, logger *log.Logger) {
 
 	defer wg.Done()
+	defer close(exitChan)
 
 	_, err := os.Stat(controlDir)
 	if os.IsNotExist(err) {
@@ -147,7 +148,7 @@ func Heartbeat(wg *sync.WaitGroup, exitChan chan bool,
 }
 
 // Write launched script's exit code to a file
-func ExitLauncher(exitCode int, resultPath string, logger *log.Logger) {
+func RecordExit(exitCode int, resultPath string, logger *log.Logger) {
 	resultFile, err := os.Create(resultPath)
 	if CheckIfErr(logger, err) {
 		return
