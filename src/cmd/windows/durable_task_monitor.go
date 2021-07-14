@@ -106,8 +106,6 @@ func main() {
 		os.Exit(-2)
 	}
 
-	fmt.Fprintf(os.Stdout, "Parent pid is: %v\n", os.Getppid())
-
 	if daemon {
 		fmt.Fprintf(os.Stdout, "1st launch pid is: %v\n", os.Getpid())
 		rebuiltArgs := common.RebuildArgs(defined, daemonFlag)
@@ -151,9 +149,7 @@ func main() {
 	wg.Add(2)
 	go launcher(&wg, exitChan, executable, args, resultPath, outputPath, launchLogger, scriptLogger)
 	go common.Heartbeat(&wg, exitChan, controlDir, resultPath, logPath, hbLogger)
-	mainLogger.Println("about to wait")
 	wg.Wait()
-	mainLogger.Println("done waiting")
 	signal.Stop(sigChan)
 	close(sigChan)
 	mainLogger.Println("done.")
