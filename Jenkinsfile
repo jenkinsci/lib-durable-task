@@ -4,5 +4,5 @@
 // tests skipped because no junit reports generated.
 buildPlugin(failFast: false, tests: [skip: true], configurations: [
         [ platform: "docker", jdk: "8", jenkins: null ],
-        [ platform: "windock", jdk: "8", jenkins: null ],
+        [ platform: "docker-windows", jdk: "8", jenkins: null ],
 ])
