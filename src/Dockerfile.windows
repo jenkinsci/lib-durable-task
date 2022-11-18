@@ -1,7 +1,7 @@
 ARG BASE_DIR=/durabletask
 ARG NAME=durable_task_monitor
 
-FROM golang:1.19.1-nanoserver AS builder
+FROM golang:1.19.3-nanoserver AS builder
 ARG BASE_DIR
 ARG NAME
 COPY cmd $BASE_DIR/cmd
