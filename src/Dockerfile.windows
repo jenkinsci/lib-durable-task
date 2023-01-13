@@ -19,6 +19,8 @@ RUN set CGO_ENABLED=0&& set GOOS=darwin&& set GOARCH=amd64&& go build -a -o %NAM
 RUN set CGO_ENABLED=0&& set GOOS=darwin&& set GOARCH=arm64&& go build -a -o %NAME%_darwin_arm64
 RUN set CGO_ENABLED=0&& set GOOS=linux&& set GOARCH=amd64&& go build -a -o %NAME%_linux_64
 RUN set CGO_ENABLED=0&& set GOOS=linux&& set GOARCH=386&& go build -a -o %NAME%_linux_32
+RUN set CGO_ENABLED=0&& set GOOS=linux&& set GOARCH=ppc64le&& go build -a -o %NAME%_linux_ppc64le
+RUN set CGO_ENABLED=0&& set GOOS=linux&& set GOARCH=arm64&& go build -a -o %NAME%_linux_aarch64
 WORKDIR $BASE_DIR/cmd/windows
 # RUN go mod tidy
 RUN go get -modcacherw jenkinsci.org/plugins/durabletask/common
