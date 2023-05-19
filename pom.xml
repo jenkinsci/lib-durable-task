@@ -137,6 +137,8 @@
                                         <file>${output.dir}/durable_task_monitor_linux_32</file>
                                         <file>${output.dir}/durable_task_monitor_win_64.exe</file>
                                         <file>${output.dir}/durable_task_monitor_win_32.exe</file>
+                                        <file>${output.dir}/durable_task_monitor_linux_ppc64le</file>
+                                        <file>${output.dir}/durable_task_monitor_linux_aarch64</file>
                                     </files>
                                 </requireFilesExist>
                             </rules>
