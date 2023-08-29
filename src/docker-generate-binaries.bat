@@ -18,6 +18,8 @@ docker cp scratch:%BASH_DIR%/%BINARY_NAME%_darwin_amd64 %DEST%
 docker cp scratch:%BASH_DIR%/%BINARY_NAME%_darwin_arm64 %DEST%
 docker cp scratch:%BASH_DIR%/%BINARY_NAME%_linux_64 %DEST%
 docker cp scratch:%BASH_DIR%/%BINARY_NAME%_linux_32 %DEST%
+docker cp scratch:%BASH_DIR%/%BINARY_NAME%_linux_ppc64le %DEST%
+docker cp scratch:%BASH_DIR%/%BINARY_NAME%_linux_aarch64 %DEST%
 docker cp scratch:%WIN_DIR%/%BINARY_NAME%_win_64.exe %DEST%
 docker cp scratch:%WIN_DIR%/%BINARY_NAME%_win_32.exe %DEST%
 docker rm -f scratch
