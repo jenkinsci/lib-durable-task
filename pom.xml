@@ -28,7 +28,7 @@
     <parent>
         <groupId>org.jenkins-ci</groupId>
         <artifactId>jenkins</artifactId>
-        <version>1.67</version>
+        <version>1.106</version>
         <relativePath />
     </parent>
     <groupId>io.jenkins.plugins</groupId>
@@ -119,7 +119,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.0.0-M3</version>
                 <executions>
                     <execution>
                         <id>enforce-binaries-generated</id>
