@@ -46,7 +46,6 @@
 
     <properties>
         <changelist>999999-SNAPSHOT</changelist>
-        <java.level>8</java.level>
         <output.dir>${project.build.directory}/classes/io/jenkins/plugins/lib-durable-task</output.dir>
     </properties>
 
