@@ -13,7 +13,8 @@ WORKDIR $BASE_DIR/cmd/bash
 # see golang.org/issue/31481
 # RUN go mod tidy
 RUN go get -modcacherw jenkinsci.org/plugins/durabletask/common
-RUN go get -modcacherw golang.org/x/sys@v0.7.0
+# TODO find some way to inject specific version of x/sys based on go.mod definitions
+RUN go get -modcacherw golang.org/x/sys@v0.38.0
 # can't test bash on windows
 RUN set CGO_ENABLED=0&& set GOOS=darwin&& set GOARCH=amd64&& go build -a -ldflags="-s -w" -trimpath -o %NAME%_darwin_amd64
 RUN set CGO_ENABLED=0&& set GOOS=darwin&& set GOARCH=arm64&& go build -a -ldflags="-s -w" -trimpath -o %NAME%_darwin_arm64
@@ -24,7 +25,7 @@ RUN set CGO_ENABLED=0&& set GOOS=linux&& set GOARCH=arm64&& go build -a -ldflags
 WORKDIR $BASE_DIR/cmd/windows
 # RUN go mod tidy
 RUN go get -modcacherw jenkinsci.org/plugins/durabletask/common
-RUN go get -modcacherw golang.org/x/sys@v0.7.0
+RUN go get -modcacherw golang.org/x/sys@v0.38.0
 RUN go test -v
 RUN set CGO_ENABLED=0& set GOOS=windows& set GOARCH=amd64& go build -a -ldflags="-s -w" -trimpath -o %NAME%_win_64.exe
 RUN set CGO_ENABLED=0& set GOOS=windows& set GOARCH=386& go build -a -ldflags="-s -w" -trimpath -o %NAME%_win_32.exe
