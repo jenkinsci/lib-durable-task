@@ -56,7 +56,7 @@ func main() {
 	close(sigChan)
 }
 `
-	tmp, err := ioutil.TempDir("", "sigcatcher")
+	tmp, err := os.MkdirTemp("", "sigcatcher")
 	if err != nil {
 		log.Fatal(err)
 	}

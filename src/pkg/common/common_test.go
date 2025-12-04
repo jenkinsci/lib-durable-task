@@ -27,7 +27,6 @@ package common_test
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -220,7 +219,7 @@ func TestRecordExit(t *testing.T) {
 	os.Remove(resultPath)
 
 	common.RecordExit(-12345678, resultPath, log.New(os.Stdout, "", 0))
-	data, err := ioutil.ReadFile(resultPath)
+	data, err := os.ReadFile(resultPath)
 	if err != nil {
 		t.Error(err)
 	}
@@ -230,7 +229,7 @@ func TestRecordExit(t *testing.T) {
 
 	// Leave old result file present
 	common.RecordExit(99999, resultPath, log.New(os.Stdout, "", 0))
-	data, err = ioutil.ReadFile(resultPath)
+	data, err = os.ReadFile(resultPath)
 	if err != nil {
 		t.Error(err)
 	}

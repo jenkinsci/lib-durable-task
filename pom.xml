@@ -76,7 +76,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <binary.generation.script>docker-generate-binaries.sh</binary.generation.script>
+                <binary.generation.script>linux/docker-generate-binaries.sh</binary.generation.script>
             </properties>
         </profile>
         <profile>
@@ -87,7 +87,7 @@
                 </os>
             </activation>
             <properties>
-                <binary.generation.script>docker-generate-binaries.bat</binary.generation.script>
+                <binary.generation.script>windows/docker-generate-binaries.bat</binary.generation.script>
             </properties>
         </profile>
     </profiles>
@@ -97,9 +97,9 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>3.5.1</version>
+                <version>3.6.2</version>
                 <configuration>
-                    <executable>${project.basedir}/src/${binary.generation.script}</executable>
+                    <executable>${project.basedir}/src/docker/${binary.generation.script}</executable>
                     <workingDirectory>${project.basedir}/src</workingDirectory>
                     <arguments>
                         <argument>${output.dir}</argument>
