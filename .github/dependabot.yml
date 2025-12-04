@@ -8,3 +8,16 @@ updates:
     directory: /
     schedule:
       interval: daily
+  - package-ecosystem: gomod
+    directories:
+      - /src/cmd/bash
+      - /src/cmd/windows
+      - /src/pkg/common
+    schedule:
+      interval: weekly
+  - package-ecosystem: docker
+    directories:
+      - /src/docker/linux
+      - /src/docker/windows
+    schedule:
+      interval: weekly
