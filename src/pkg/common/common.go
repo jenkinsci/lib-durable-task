@@ -26,7 +26,7 @@ package common
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 	"strconv"
@@ -89,9 +89,9 @@ func RebuildArgs(defined map[string]string, daemonFlag string) []string {
 
 // Set up the various loggers
 func PrepareLogging(logFile *os.File, debug bool) (main, heartbeat, launch, script *log.Logger) {
-	mainLogOut := ioutil.Discard
-	hbLogOut := ioutil.Discard
-	launchLogOut := ioutil.Discard
+	mainLogOut := io.Discard
+	hbLogOut := io.Discard
+	launchLogOut := io.Discard
 	if debug {
 		mainLogOut = logFile
 		hbLogOut = logFile
