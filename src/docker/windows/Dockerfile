@@ -15,19 +15,19 @@ WORKDIR $BASE_DIR/cmd/bash
 RUN go get -modcacherw jenkinsci.org/plugins/durabletask/common
 RUN go get -modcacherw golang.org/x/sys@v0.7.0
 # can't test bash on windows
-RUN set CGO_ENABLED=0&& set GOOS=darwin&& set GOARCH=amd64&& go build -a -o %NAME%_darwin_amd64
-RUN set CGO_ENABLED=0&& set GOOS=darwin&& set GOARCH=arm64&& go build -a -o %NAME%_darwin_arm64
-RUN set CGO_ENABLED=0&& set GOOS=linux&& set GOARCH=amd64&& go build -a -o %NAME%_linux_64
-RUN set CGO_ENABLED=0&& set GOOS=linux&& set GOARCH=386&& go build -a -o %NAME%_linux_32
-RUN set CGO_ENABLED=0&& set GOOS=linux&& set GOARCH=ppc64le&& go build -a -o %NAME%_linux_ppc64le
-RUN set CGO_ENABLED=0&& set GOOS=linux&& set GOARCH=arm64&& go build -a -o %NAME%_linux_aarch64
+RUN set CGO_ENABLED=0&& set GOOS=darwin&& set GOARCH=amd64&& go build -a -ldflags="-s -w" -trimpath -o %NAME%_darwin_amd64
+RUN set CGO_ENABLED=0&& set GOOS=darwin&& set GOARCH=arm64&& go build -a -ldflags="-s -w" -trimpath -o %NAME%_darwin_arm64
+RUN set CGO_ENABLED=0&& set GOOS=linux&& set GOARCH=amd64&& go build -a -ldflags="-s -w" -trimpath -o %NAME%_linux_64
+RUN set CGO_ENABLED=0&& set GOOS=linux&& set GOARCH=386&& go build -a -ldflags="-s -w" -trimpath -o %NAME%_linux_32
+RUN set CGO_ENABLED=0&& set GOOS=linux&& set GOARCH=ppc64le&& go build -a -ldflags="-s -w" -trimpath -o %NAME%_linux_ppc64le
+RUN set CGO_ENABLED=0&& set GOOS=linux&& set GOARCH=arm64&& go build -a -ldflags="-s -w" -trimpath -o %NAME%_linux_aarch64
 WORKDIR $BASE_DIR/cmd/windows
 # RUN go mod tidy
 RUN go get -modcacherw jenkinsci.org/plugins/durabletask/common
 RUN go get -modcacherw golang.org/x/sys@v0.7.0
 RUN go test -v
-RUN set CGO_ENABLED=0& set GOOS=windows& set GOARCH=amd64& go build -a -o %NAME%_win_64.exe
-RUN set CGO_ENABLED=0& set GOOS=windows& set GOARCH=386& go build -a -o %NAME%_win_32.exe
+RUN set CGO_ENABLED=0& set GOOS=windows& set GOARCH=amd64& go build -a -ldflags="-s -w" -trimpath -o %NAME%_win_64.exe
+RUN set CGO_ENABLED=0& set GOOS=windows& set GOARCH=386& go build -a -ldflags="-s -w" -trimpath -o %NAME%_win_32.exe
 
 # TODO: uncomment once docker build --output (i.e. BuildKit) is available for windows containers
 # see: https://github.com/microsoft/Windows-Containers/issues/34
