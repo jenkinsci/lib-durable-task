@@ -1,7 +1,7 @@
 ARG BASE_DIR=/durabletask
 ARG NAME=durable_task_monitor
 
-FROM golang:1.25.5-bookworm AS builder
+FROM golang:1.26rc2-bookworm AS builder
 ARG BASE_DIR
 ARG NAME
 COPY cmd $BASE_DIR/cmd
