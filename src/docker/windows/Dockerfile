@@ -4,6 +4,7 @@ ARG NAME=durable_task_monitor
 FROM golang:1.26.0-nanoserver AS builder
 ARG BASE_DIR
 ARG NAME
+ARG X_SYS_VERSION
 COPY cmd $BASE_DIR/cmd
 COPY pkg $BASE_DIR/pkg
 WORKDIR $BASE_DIR/pkg/common
@@ -13,8 +14,7 @@ WORKDIR $BASE_DIR/cmd/bash
 # see golang.org/issue/31481
 # RUN go mod tidy
 RUN go get -modcacherw jenkinsci.org/plugins/durabletask/common
-# TODO find some way to inject specific version of x/sys based on go.mod definitions
-RUN go get -modcacherw golang.org/x/sys@v0.41.0
+RUN go get -modcacherw golang.org/x/sys@%X_SYS_VERSION%
 # can't test bash on windows
 RUN set CGO_ENABLED=0&& set GOOS=darwin&& set GOARCH=amd64&& go build -a -ldflags="-s -w" -trimpath -o %NAME%_darwin_amd64
 RUN set CGO_ENABLED=0&& set GOOS=darwin&& set GOARCH=arm64&& go build -a -ldflags="-s -w" -trimpath -o %NAME%_darwin_arm64
@@ -25,7 +25,7 @@ RUN set CGO_ENABLED=0&& set GOOS=linux&& set GOARCH=arm64&& go build -a -ldflags
 WORKDIR $BASE_DIR/cmd/windows
 # RUN go mod tidy
 RUN go get -modcacherw jenkinsci.org/plugins/durabletask/common
-RUN go get -modcacherw golang.org/x/sys@v0.41.0
+RUN go get -modcacherw golang.org/x/sys@%X_SYS_VERSION%
 RUN go test -v
 RUN set CGO_ENABLED=0& set GOOS=windows& set GOARCH=amd64& go build -a -ldflags="-s -w" -trimpath -o %NAME%_win_64.exe
 RUN set CGO_ENABLED=0& set GOOS=windows& set GOARCH=386& go build -a -ldflags="-s -w" -trimpath -o %NAME%_win_32.exe

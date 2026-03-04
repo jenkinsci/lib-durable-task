@@ -11,8 +11,12 @@ set IMG_NAME=durable-task-binary-generator
 set BINARY_NAME=durable_task_monitor
 set BASH_DIR=/durabletask/cmd/bash
 set WIN_DIR=/durabletask/cmd/windows
+
+rem Extract golang.org/x/sys version from go.mod
+for /f "tokens=2" %%a in ('findstr "golang.org/x/sys" cmd\windows\go.mod') do set X_SYS_VERSION=%%a
+
 mkdir "%DEST%"
-docker build --no-cache -t %IMG_NAME%:0.0 -f docker/windows/Dockerfile .
+docker build --no-cache --build-arg X_SYS_VERSION=%X_SYS_VERSION% -t %IMG_NAME%:0.0 -f docker/windows/Dockerfile .
 docker create -ti --name scratch %IMG_NAME%:0.0
 docker cp scratch:%BASH_DIR%/%BINARY_NAME%_darwin_amd64 %DEST%
 docker cp scratch:%BASH_DIR%/%BINARY_NAME%_darwin_arm64 %DEST%
