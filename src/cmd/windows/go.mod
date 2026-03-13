@@ -1,6 +1,6 @@
 module jenkinsci.org/plugins/durabletask/windows
 
-go 1.26
+go 1.26.1
 
 replace jenkinsci.org/plugins/durabletask/common => ../../pkg/common
 

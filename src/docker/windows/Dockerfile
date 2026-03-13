@@ -1,7 +1,7 @@
 ARG BASE_DIR=/durabletask
 ARG NAME=durable_task_monitor
 
-FROM golang:1.26.0-nanoserver AS builder
+FROM golang:1.26.1-nanoserver AS builder
 ARG BASE_DIR
 ARG NAME
 ARG X_SYS_VERSION

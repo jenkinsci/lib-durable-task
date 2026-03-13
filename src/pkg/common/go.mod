@@ -1,3 +1,3 @@
 module jenkinsci.org/plugins/durabletask/common
 
-go 1.26
+go 1.26.1
