@@ -115,7 +115,7 @@ func main() {
 		doubleLaunchCmd.Stderr = nil
 		var sysAttr windows.SysProcAttr
 		sysAttr.HideWindow = true
-		sysAttr.CreationFlags = windows.CREATE_NEW_PROCESS_GROUP
+		sysAttr.CreationFlags = windows.CREATE_NEW_PROCESS_GROUP | windows.CREATE_BREAKAWAY_FROM_JOB
 		sysAttr.NoInheritHandles = true
 		doubleLaunchCmd.SysProcAttr = &sysAttr
 		doubleLaunchErr := doubleLaunchCmd.Start()
