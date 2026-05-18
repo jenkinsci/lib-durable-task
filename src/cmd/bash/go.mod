@@ -1,6 +1,6 @@
 module jenkinsci.org/plugins/durabletask/bash
 
-go 1.26
+go 1.26.2
 
 replace jenkinsci.org/plugins/durabletask/common => ../../pkg/common
 
