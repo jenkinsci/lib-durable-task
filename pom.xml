@@ -28,7 +28,7 @@
     <parent>
         <groupId>org.jenkins-ci</groupId>
         <artifactId>jenkins</artifactId>
-        <version>1.142</version>
+        <version>2.1328.vfd10e2339a_19</version>
         <relativePath />
     </parent>
     <groupId>io.jenkins.plugins</groupId>
@@ -47,6 +47,8 @@
     <properties>
         <changelist>999999-SNAPSHOT</changelist>
         <output.dir>${project.build.directory}/classes/io/jenkins/plugins/lib-durable-task</output.dir>
+        <!-- Until durable-task-plugin is on 2.555.x: -->
+        <maven.compiler.release>17</maven.compiler.release>
     </properties>
 
     <repositories>
@@ -97,7 +99,6 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>3.6.3</version>
                 <configuration>
                     <executable>${project.basedir}/src/docker/${binary.generation.script}</executable>
                     <workingDirectory>${project.basedir}/src</workingDirectory>
