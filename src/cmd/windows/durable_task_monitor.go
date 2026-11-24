@@ -115,7 +115,15 @@ func main() {
 		doubleLaunchCmd.Stderr = nil
 		var sysAttr windows.SysProcAttr
 		sysAttr.HideWindow = true
-		sysAttr.CreationFlags = windows.CREATE_NEW_PROCESS_GROUP | windows.CREATE_BREAKAWAY_FROM_JOB
+		// CREATE_NEW_CONSOLE gives the surviving process tree a console of its own.
+		// CREATE_BREAKAWAY_FROM_JOB already lets it outlive the launching session's job object,
+		// but without a new console it keeps the console it inherited from that session - and when
+		// the session goes away, that console is destroyed while the process lives on. Every
+		// console API call from the step then fails with Win32 233 ERROR_PIPE_NOT_CONNECTED, which
+		// in a PowerShell step surfaces as "No process is on the other end of the pipe" 0xE9 from
+		// GetConsoleScreenBufferInfo, and in a batch step as failed CONOUT$ writes and an inability
+		// to spawn console child processes at all. HideWindow keeps the new console invisible.
+		sysAttr.CreationFlags = windows.CREATE_NEW_PROCESS_GROUP | windows.CREATE_BREAKAWAY_FROM_JOB | windows.CREATE_NEW_CONSOLE
 		sysAttr.NoInheritHandles = true
 		doubleLaunchCmd.SysProcAttr = &sysAttr
 		doubleLaunchErr := doubleLaunchCmd.Start()
